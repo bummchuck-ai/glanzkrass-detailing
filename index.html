@@ -39,7 +39,7 @@
         }
 
         .horizontal-container {
-            width: 300%;
+            width: 400%;
             height: 100%;
             display: flex;
             flex-wrap: nowrap;
@@ -81,8 +81,18 @@
             overflow: hidden;
         }
 
-        .img-parallax {
-            transition: transform 0.5s ease-out;
+        .img-reveal {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            transition: transform 1.5s ease;
+        }
+        .horizontal-section:hover .img-reveal {
+            transform: scale(1.1);
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -90,7 +100,7 @@
     <div class="bg-animated"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full p-6 flex justify-between items-center z-50 bg-black/10 backdrop-blur-md border-b border-white/5">
+    <nav class="fixed top-0 w-full p-6 flex justify-between items-center z-50 bg-black/20 backdrop-blur-xl border-b border-white/5">
         <div class="impact-font text-3xl tracking-wider accent-text">GLANZKRASS</div>
         <div class="hidden md:flex space-x-10 text-[10px] uppercase tracking-[0.4em] font-bold">
             <a href="#services" class="hover:accent-text transition">Leistungen</a>
@@ -103,21 +113,21 @@
     <!-- Hero -->
     <section class="min-h-screen relative flex items-center justify-center p-6">
         <div class="absolute inset-0 z-0 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1517524008410-b44c6659ca42?auto=format&fit=crop&q=80&w=2000" class="w-full h-full object-cover opacity-30 scale-105" data-aos="zoom-out" data-aos-duration="5000">
+            <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/174e01f3-6aff-4b54-bec6-cabc866100c1/image.jpg" class="w-full h-full object-cover opacity-30 scale-105" data-aos="zoom-out" data-aos-duration="5000">
         </div>
 
         <div class="relative z-10 max-w-7xl mx-auto w-full">
             <div data-aos="fade-up">
-                <span class="inline-block px-3 py-1 border border-accent-text text-accent-text text-[10px] tracking-[0.5em] uppercase mb-8">Premium Refinement</span>
+                <span class="inline-block px-3 py-1 border border-accent-text text-accent-text text-[10px] tracking-[0.5em] uppercase mb-8">Wellness für dein Auto</span>
                 <h1 class="impact-font text-7xl md:text-[12rem] leading-[0.8] mb-12 tracking-tighter uppercase">
                     Krasser<br><span class="accent-text">Glanz.</span>
                 </h1>
                 <div class="flex flex-col md:flex-row items-end gap-12">
                     <p class="text-zinc-500 text-xl max-w-sm leading-relaxed border-l-2 border-accent-text pl-8">
-                        Wir definieren Fahrzeugaufbereitung neu. Präzision, Leidenschaft und ein Glanz, der sprachlos macht.
+                        Dein Spezialist für professionelle Autopflege im Papenteich. Leidenschaft, Präzision und der Blick fürs Detail.
                     </p>
                     <a href="#kontakt" class="text-white impact-font text-2xl group flex items-center space-x-4">
-                        <span>ENTDECKE DIE PERFEKTION</span>
+                        <span>ANFRAGE SENDEN</span>
                         <span class="accent-text transform group-hover:translate-x-3 transition">→</span>
                     </a>
                 </div>
@@ -128,79 +138,109 @@
     <!-- Horizontal Slideshow -->
     <section id="services" class="pin-section relative">
         <div class="horizontal-container">
+            <!-- Innenreinigung -->
             <div class="horizontal-section relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&q=80&w=2000" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/4f01127f-68b5-44e9-b854-4c956611b040/image.jpg" class="img-reveal">
                 <div class="relative z-10 p-12 card-glass max-w-xl" data-aos="zoom-in">
-                    <h2 class="impact-font text-6xl mb-4">DETAILED<br>INTERIEUR.</h2>
-                    <p class="text-zinc-400 text-lg mb-8">Porentiefe Pflege bis in den letzten Winkel. Wir beleben Ihren Innenraum neu.</p>
+                    <h2 class="impact-font text-6xl mb-4">INNENRAUM<br>REINIGUNG.</h2>
+                    <p class="text-zinc-400 text-lg mb-8">Tiefensauber & spürbar gepflegt. Wir entfernen gründlich Staub, Schmutz und Gerüche – auch an schwer erreichbaren Stellen. Hygienisch rein bis in die Lüftungsschlitze.</p>
                     <div class="h-1 w-24 accent-bg"></div>
                 </div>
             </div>
+            <!-- Außenreinigung -->
             <div class="horizontal-section relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/230c22d7-6b9a-4838-812a-1c8f7cc1f110/image.jpg" class="img-reveal">
                 <div class="relative z-10 p-12 card-glass max-w-xl">
-                    <h2 class="impact-font text-6xl mb-4">PAINT<br>CORRECTION.</h2>
-                    <p class="text-zinc-400 text-lg mb-8">Wir entfernen Kratzer, nicht nur den Schmutz. Ein Finish wie Glas.</p>
+                    <h2 class="impact-font text-6xl mb-4">AUSSEN<br>REINIGUNG.</h2>
+                    <p class="text-zinc-400 text-lg mb-8">Lackschonende Handwäsche vom Profi. Ob Teer oder Flugrost – wir haben für alles das richtige Mittel. Ganz ohne aggressive Bürsten oder Waschstraßenkratzer.</p>
                     <div class="h-1 w-24 accent-bg"></div>
                 </div>
             </div>
+            <!-- Lackaufbereitung -->
             <div class="horizontal-section relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1621248039233-a309e3776997?auto=format&fit=crop&q=80&w=2000" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/6f5e7835-a660-4c63-b5e2-f54ce86d4909/image.jpg" class="img-reveal">
                 <div class="relative z-10 p-12 card-glass max-w-xl">
-                    <h2 class="impact-font text-6xl mb-4">ULTIMATE<br>PROTECTION.</h2>
-                    <p class="text-zinc-400 text-lg mb-8">Ceramic-Coatings für langanhaltenden Schutz und brutalen Tiefenglanz.</p>
+                    <h2 class="impact-font text-6xl mb-4">LACK<br>PERFEKTION.</h2>
+                    <p class="text-zinc-400 text-lg mb-8">Mehrstufiges Polieren entfernt Kratzer, Hologramme und Oxidationen. Wir bringen stumpfen Lack wieder zum Strahlen – für beeindruckenden Tiefenglanz.</p>
+                    <div class="h-1 w-24 accent-bg"></div>
+                </div>
+            </div>
+            <!-- Keramik -->
+            <div class="horizontal-section relative overflow-hidden">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/857e5a13-41d5-46d7-9b93-eabf1d49104b/image.jpg" class="img-reveal">
+                <div class="relative z-10 p-12 card-glass max-w-xl">
+                    <h2 class="impact-font text-6xl mb-4">KERAMIK<br>PROTECTION.</h2>
+                    <p class="text-zinc-400 text-lg mb-8">High-End-Versiegelung mit einer Standzeit von bis zu 36 Monaten. Wasser und Schmutz haben keine Chance mehr. Dauerhafter Schutz wie am ersten Tag.</p>
                     <div class="h-1 w-24 accent-bg"></div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Über Uns Section -->
+    <section id="about" class="py-32 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24">
+            <div class="w-full md:w-1/2" data-aos="fade-right">
+                <h2 class="impact-font text-7xl mb-8 uppercase">Über <span class="accent-text">Glanzkrass.</span></h2>
+                <div class="space-y-6 text-zinc-400 text-xl leading-relaxed">
+                    <p>Mein Name ist <span class="text-white font-bold">Mario Kirchner</span> und ich bin mit meinem Dienstleistungsunternehmen genau der richtige Ansprechpartner, wenn es um professionelle Autopflege und Fahrzeugaufbereitung geht.</p>
+                    <p>Ob Innenreinigung, Lackpflege oder komplette Fahrzeugaufbereitung – wir bringen dein Auto auf Hochglanz. Erlebe den Unterschied – Glanzkrass macht’s möglich!</p>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 relative" data-aos="fade-left">
+                <div class="absolute inset-0 accent-bg opacity-10 blur-3xl rounded-full"></div>
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" class="relative z-10 rounded-none border border-white/5 grayscale hover:grayscale-0 transition duration-1000 shadow-2xl">
+            </div>
+        </div>
+    </section>
+
     <!-- Maps & Contact Split -->
-    <section id="anfahrt" class="py-32 px-6">
+    <section id="anfahrt" class="py-32 px-6 bg-zinc-950">
         <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-24">
             <div data-aos="fade-right">
                 <h2 class="impact-font text-6xl mb-12">UNSER<br><span class="accent-text">STANDORT.</span></h2>
                 <div class="space-y-12 mb-16">
                     <div>
-                        <p class="text-accent-text text-xs uppercase tracking-widest mb-2 font-bold">Adresse</p>
-                        <p class="text-2xl font-light italic">Am Moorkamp 8,<br>38527 Meine / Wedelheine</p>
+                        <p class="text-accent-text text-[10px] uppercase tracking-[0.5em] mb-4 font-bold">Adresse</p>
+                        <p class="text-3xl font-light italic">Am Moorkamp 8,<br>38527 Meine / Wedelheine</p>
                     </div>
                     <div>
-                        <p class="text-accent-text text-xs uppercase tracking-widest mb-2 font-bold">Direktkontakt</p>
-                        <p class="text-2xl font-light italic">+49 178 2802191</p>
+                        <p class="text-accent-text text-[10px] uppercase tracking-[0.5em] mb-4 font-bold">Direktkontakt</p>
+                        <p class="text-3xl font-light italic">+49 178 2802191</p>
                     </div>
                 </div>
-                <a href="https://www.google.com/maps/dir/?api=1&destination=Am+Moorkamp+8,+38527+Meine" target="_blank" class="inline-block accent-bg text-black impact-font text-xl px-12 py-6 hover:bg-white transition uppercase">Route Starten →</a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=Am+Moorkamp+8,+38527+Meine" target="_blank" class="inline-block accent-bg text-black impact-font text-2xl px-12 py-6 hover:bg-white transition uppercase">Route Starten →</a>
             </div>
-            <div class="h-[500px] border border-white/10 rounded-none overflow-hidden grayscale hover:grayscale-0 transition duration-1000" data-aos="fade-left">
+            <div class="h-[600px] border border-white/10 rounded-none overflow-hidden grayscale hover:grayscale-0 transition duration-1000 shadow-2xl" data-aos="fade-left">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </section>
 
     <!-- Final Contact Form -->
-    <section id="kontakt" class="py-32 px-6 bg-zinc-950">
+    <section id="kontakt" class="py-32 px-6">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="impact-font text-7xl mb-16" data-aos="fade-up">JETZT ANFRAGEN.</h2>
-            <form class="grid grid-cols-1 md:grid-cols-2 gap-12 text-left" data-aos="fade-up" data-aos-delay="200">
-                <input type="text" placeholder="IHR NAME" class="input-underlined p-4 text-sm font-bold uppercase tracking-widest">
-                <input type="email" placeholder="IHR E-MAIL" class="input-underlined p-4 text-sm font-bold uppercase tracking-widest">
+            <h2 class="impact-font text-8xl mb-16" data-aos="fade-up">JETZT ANFRAGEN.</h2>
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-16 text-left" data-aos="fade-up" data-aos-delay="200">
+                <input type="text" placeholder="IHR NAME" class="input-underlined p-4 text-sm font-bold uppercase tracking-[0.2em]">
+                <input type="email" placeholder="IHR E-MAIL" class="input-underlined p-4 text-sm font-bold uppercase tracking-[0.2em]">
                 <div class="md:col-span-2">
-                    <textarea rows="4" placeholder="IHR FAHRZEUG & WÜNSCHE" class="input-underlined w-full p-4 text-sm font-bold uppercase tracking-widest"></textarea>
+                    <textarea rows="4" placeholder="IHR FAHRZEUG & WÜNSCHE" class="input-underlined w-full p-4 text-sm font-bold uppercase tracking-[0.2em]"></textarea>
                 </div>
                 <div class="md:col-span-2 text-center mt-8">
-                    <button type="submit" class="border border-accent-text text-accent-text impact-font text-3xl px-20 py-8 hover:bg-accent-text hover:text-black transition uppercase">Absenden</button>
+                    <button type="submit" class="border border-accent-text text-accent-text impact-font text-4xl px-24 py-8 hover:bg-accent-text hover:text-black transition uppercase">Absenden</button>
                 </div>
             </form>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="p-12 border-t border-white/5 text-center bg-black">
-        <div class="impact-font text-4xl mb-8 tracking-widest accent-text">GLANZKRASS.</div>
-        <div class="flex justify-center space-x-12 text-zinc-500 text-[10px] tracking-[0.3em] uppercase mb-12">
+    <footer class="p-24 border-t border-white/5 text-center bg-black">
+        <div class="impact-font text-5xl mb-12 tracking-widest accent-text">GLANZKRASS.</div>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-12 text-zinc-600 text-[10px] tracking-[0.4em] uppercase mb-16">
             <a href="impressum.html" class="hover:text-white transition">Impressum</a>
             <a href="datenschutz.html" class="hover:text-white transition">Datenschutz</a>
+            <a href="https://www.instagram.com/glanzkrass/" target="_blank" class="hover:text-white transition">Instagram</a>
         </div>
         <div class="text-zinc-800 text-[8px] tracking-[0.5em] uppercase">
             &copy; 2026 GLANZKRASS | MARIO KIRCHNER | ALL RIGHTS RESERVED
