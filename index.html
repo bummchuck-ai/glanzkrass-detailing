@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLANZKRASS | Professionelle Fahrzeugaufbereitung im Papenteich</title>
     <meta name="description" content="Glanzkrass – Dein Spezialist für professionelle Fahrzeugaufbereitung. Lackpolitur, Keramikversiegelung, Innen- & Außenreinigung. Papenteich / Meine.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GlanzKrass | Professionelle Fahrzeugaufbereitung">
+    <meta property="og:description" content="Dein Spezialist für Lackpolitur, Keramikversiegelung, Innen- & Außenreinigung im Papenteich.">
+    <meta property="og:image" content="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg">
+    <meta property="og:url" content="https://www.glanzkrass.de/">
+    <meta property="og:locale" content="de_DE">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
@@ -904,7 +912,7 @@
         <a href="#kontakt" onclick="navClose()">Kontakt</a>
     </nav>
     <div class="nav-footer">
-        <a href="tel:+4917828021918">+49 178 2802191</a><br>
+        <a href="tel:+491782802191">+49 178 2802191</a><br>
         <a href="mailto:info@glanzkrass.de">info@glanzkrass.de</a>
     </div>
 </div>
@@ -1216,7 +1224,7 @@
                 </div>
             </div>
             <div class="about-img-wrap reveal delay-1">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" alt="Mario Kirchner – GlanzKrass Fahrzeugaufbereitung" loading="lazy">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" alt="Mario Kirchner – GlanzKrass Fahrzeugaufbereitung" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<div style=&quot;display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:64px;background:rgba(0,212,255,0.05);border-radius:16px;&quot;>GK</div>'">
             </div>
         </div>
     </div>
@@ -1230,22 +1238,27 @@
             <h2 class="sec-title">Termin<br><span class="accent">Anfragen.</span></h2>
         </div>
         <div class="kontakt-grid">
-            <form class="reveal" onsubmit="formSubmit(event)">
+            <form class="reveal" action="https://formsubmit.co/info@glanzkrass.de" method="POST" onsubmit="formSubmit(event)">
+                <input type="hidden" name="_subject" value="Neue Anfrage über glanzkrass.de">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_next" value="https://www.glanzkrass.de/">
+                <input type="text" name="_honey" style="display:none">
                 <div class="form-field">
-                    <label>Ihr Name</label>
-                    <input type="text" required placeholder="Max Mustermann">
+                    <label for="form-name">Ihr Name</label>
+                    <input id="form-name" type="text" name="Name" required placeholder="Max Mustermann">
                 </div>
                 <div class="form-field">
-                    <label>Telefon oder E-Mail</label>
-                    <input type="text" required placeholder="+49 ... oder name@mail.de">
+                    <label for="form-contact">Telefon oder E-Mail</label>
+                    <input id="form-contact" type="text" name="Kontakt" required placeholder="+49 ... oder name@mail.de">
                 </div>
                 <div class="form-field">
-                    <label>Ihr Fahrzeug</label>
-                    <input type="text" placeholder="z.B. VW Golf VII, Baujahr 2019, schwarz">
+                    <label for="form-vehicle">Ihr Fahrzeug</label>
+                    <input id="form-vehicle" type="text" name="Fahrzeug" placeholder="z.B. VW Golf VII, Baujahr 2019, schwarz">
                 </div>
                 <div class="form-field">
-                    <label>Gewünschte Leistung</label>
-                    <select>
+                    <label for="form-service">Gewünschte Leistung</label>
+                    <select id="form-service" name="Leistung">
                         <option value="">Bitte wählen …</option>
                         <option>Innenreinigung Basic</option>
                         <option>Außenreinigung Basic</option>
@@ -1259,8 +1272,8 @@
                     </select>
                 </div>
                 <div class="form-field">
-                    <label>Nachricht</label>
-                    <textarea placeholder="Weitere Details, Terminwünsche …"></textarea>
+                    <label for="form-message">Nachricht</label>
+                    <textarea id="form-message" name="Nachricht" placeholder="Weitere Details, Terminwünsche …"></textarea>
                 </div>
                 <p class="form-dsgvo">
                     Mit dem Absenden stimmen Sie unserer <a href="datenschutz.html">Datenschutzerklärung</a> zu.
@@ -1281,7 +1294,7 @@
                         <div class="ci-icon">📞</div>
                         <div>
                             <div class="ci-lbl">Telefon</div>
-                            <a class="ci-val" href="tel:+4917828021918">+49 178 2802191</a>
+                            <a class="ci-val" href="tel:+491782802191">+49 178 2802191</a>
                         </div>
                     </div>
                     <div class="glass ci">
@@ -1299,13 +1312,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="map-box">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde"
-                        width="100%" height="100%"
-                        style="border:0;" allowfullscreen="" loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                <div class="map-box" id="map-container">
+                    <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;text-align:center;padding:32px;color:var(--muted);font-size:14px;line-height:1.7;">
+                        <div>
+                            <p style="margin-bottom:16px;">Zum Anzeigen der Karte werden Daten an Google übertragen.</p>
+                            <button onclick="loadMap()" class="btn btn-ghost" style="font-size:10px;padding:12px 24px;">Karte laden</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1322,7 +1335,7 @@
                 <a href="datenschutz.html">Datenschutz</a>
                 <a href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">Instagram</a>
                 <a href="mailto:info@glanzkrass.de">E-Mail</a>
-                <a href="tel:+4917828021918">Telefon</a>
+                <a href="tel:+491782802191">Telefon</a>
             </div>
             <div class="footer-copy">© 2026 GlanzKrass · Mario Kirchner · Am Moorkamp 8, 38527 Meine</div>
         </div>
@@ -1464,19 +1477,20 @@ if (localStorage.getItem('gk_consent') !== null) {
     document.getElementById('cookie').classList.add('hidden');
 }
 
+/* ═══════ MAP (DSGVO) ═══════ */
+function loadMap() {
+    const container = document.getElementById('map-container');
+    container.innerHTML = '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
+}
+if (localStorage.getItem('gk_consent') === '1') loadMap();
+
 /* ═══════ FORM ═══════ */
 function formSubmit(e) {
-    e.preventDefault();
     const btn = e.target.querySelector('.form-submit');
-    btn.textContent = '✓ Anfrage gesendet!';
+    btn.textContent = '✓ Wird gesendet…';
     btn.style.background = '#00ff99';
     btn.disabled = true;
-    setTimeout(() => {
-        btn.textContent = 'Anfrage senden →';
-        btn.style.background = '';
-        btn.disabled = false;
-        e.target.reset();
-    }, 4000);
+    /* Form submits natively to FormSubmit.co via action/method */
 }
 </script>
 </body>
