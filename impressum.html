@@ -2,14 +2,61 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Impressum | GLANZKRASS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { background-color: #000; color: #fff; font-family: sans-serif; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressum – GlanzKrass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --accent: #00d4ff; --bg: #030509; --text: #ddeef5; --muted: rgba(200,225,235,0.42); }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .container { max-width: 760px; margin: 0 auto; padding: 80px 28px 120px; }
+        .back {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Chakra Petch', sans-serif; font-size: 10px;
+            letter-spacing: 0.35em; text-transform: uppercase;
+            color: var(--accent); text-decoration: none;
+            margin-bottom: 56px; transition: opacity 0.3s;
+        }
+        .back:hover { opacity: 0.7; }
+        h1 { font-family: 'Chakra Petch', sans-serif; font-size: clamp(40px, 8vw, 72px); font-weight: 700; text-transform: uppercase; line-height: 0.9; margin-bottom: 48px; }
+        h1 span { color: var(--accent); }
+        h2 { font-family: 'Chakra Petch', sans-serif; font-size: 12px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin: 36px 0 10px; }
+        p { font-size: 15px; color: var(--muted); line-height: 1.8; margin-bottom: 6px; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        hr { border: none; height: 1px; background: rgba(255,255,255,0.06); margin: 28px 0; }
+    </style>
 </head>
-<body class="p-12 max-w-3xl mx-auto">
-    <h1 class="text-4xl font-bold mb-8">Impressum</h1>
-    <p class="mb-4">Mario Kirchner<br>Am Moorkamp 8<br>38527 Meine / Wedelheine</p>
-    <p class="mb-4"><strong>Kontakt:</strong><br>Telefon: +49 178 2802191<br>E-Mail: Info@glanzkrass.de</p>
-    <a href="index.html" class="text-zinc-500 hover:text-white transition underline mt-12 block">Zurück zur Startseite</a>
+<body>
+<div class="container">
+    <a href="index.html" class="back">← Zurück zur Startseite</a>
+    <h1>Impressum<br><span>GlanzKrass.</span></h1>
+
+    <h2>Angaben gemäß § 5 TMG</h2>
+    <p>Mario Kirchner<br>GlanzKrass Fahrzeugaufbereitung<br>Am Moorkamp 8<br>38527 Meine / Wedelheine</p>
+    <hr>
+
+    <h2>Kontakt</h2>
+    <p>Telefon: <a href="tel:+4917828021918">+49 178 2802191</a></p>
+    <p>E-Mail: <a href="mailto:info@glanzkrass.de">info@glanzkrass.de</a></p>
+    <hr>
+
+    <h2>Umsatzsteuer-ID</h2>
+    <p>Sofern umsatzsteuerpflichtig: Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG auf Anfrage.</p>
+    <hr>
+
+    <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+    <p>Mario Kirchner, Am Moorkamp 8, 38527 Meine</p>
+    <hr>
+
+    <h2>Haftungsausschluss</h2>
+    <p>Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte verantwortlich. Gemäß §§ 8–10 TMG sind wir nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+    <hr>
+
+    <h2>Urheberrecht</h2>
+    <p>Die durch den Seitenbetreiber erstellten Inhalte und Werke unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung oder Verbreitung außerhalb der Grenzen des Urheberrechts bedarf der schriftlichen Zustimmung des Autors.</p>
+</div>
 </body>
 </html>

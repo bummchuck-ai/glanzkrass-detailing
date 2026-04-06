@@ -3,274 +3,1481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLANZKRASS | Fahrzeugaufbereitung & Detailing</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <title>GLANZKRASS | Professionelle Fahrzeugaufbereitung im Papenteich</title>
+    <meta name="description" content="Glanzkrass – Dein Spezialist für professionelle Fahrzeugaufbereitung. Lackpolitur, Keramikversiegelung, Innen- & Außenreinigung. Papenteich / Meine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: #000; 
-            color: #fff; 
-            scroll-behavior: smooth;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #030509;
+            --bg2: #060a10;
+            --accent: #00d4ff;
+            --accent2: #0055cc;
+            --glass: rgba(255,255,255,0.035);
+            --glass-hover: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.07);
+            --glass-border-accent: rgba(0,212,255,0.18);
+            --text: #ddeef5;
+            --muted: rgba(200,225,235,0.38);
+            --display: 'Chakra Petch', sans-serif;
+            --body: 'DM Sans', sans-serif;
         }
-        .impact-font { font-family: 'Bebas Neue', sans-serif; }
-        .accent-text { color: #00ffcc; }
-        .accent-bg { background-color: #00ffcc; }
-        
-        .bg-animated {
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--body);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* ── CUSTOM CURSOR ── */
+        #cursor {
             position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            top: 0;
-            left: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: transform 0.08s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+            mix-blend-mode: screen;
+        }
+        #cursor-ring {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,212,255,0.4);
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+        }
+        body:hover #cursor { opacity: 1; }
+
+        /* ── CANVAS ── */
+        #rain-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .horizontal-container {
-            width: 400%;
-            height: 100%;
-            display: flex;
-            flex-wrap: nowrap;
+        /* ── GLASS ── */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+        .glass-accent {
+            background: rgba(0,212,255,0.05);
+            backdrop-filter: blur(32px) saturate(180%);
+            -webkit-backdrop-filter: blur(32px) saturate(180%);
+            border: 1px solid var(--glass-border-accent);
+            border-radius: 16px;
         }
 
-        .horizontal-section {
-            width: 100vw;
-            height: 100vh;
+        /* ── LAYOUT ── */
+        section { position: relative; z-index: 1; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+
+        /* ── REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
+        }
+        .reveal.delay-1 { transition-delay: 0.12s; }
+        .reveal.delay-2 { transition-delay: 0.24s; }
+        .reveal.delay-3 { transition-delay: 0.36s; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ──────────────────────────────
+           HERO
+        ────────────────────────────── */
+        #hero {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 2rem;
-        }
-
-        .card-glass {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(50px);
-            border: 1px solid rgba(0, 255, 204, 0.1);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        .pin-section {
+            padding: 100px 28px 80px;
+            position: relative;
             overflow: hidden;
         }
+        #hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--bg), transparent);
+            pointer-events: none;
+        }
+        .hero-glow {
+            position: absolute;
+            top: 10%;
+            left: -10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0,212,255,0.055) 0%, transparent 65%);
+            pointer-events: none;
+            animation: glowPulse 8s ease-in-out infinite;
+        }
+        .hero-glow2 {
+            position: absolute;
+            bottom: 5%;
+            right: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0,85,200,0.04) 0%, transparent 65%);
+            pointer-events: none;
+            animation: glowPulse 10s ease-in-out infinite reverse;
+        }
+        @keyframes glowPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.7; }
+        }
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--display);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            color: var(--accent);
+            padding: 9px 18px 9px 14px;
+            border: 1px solid rgba(0,212,255,0.28);
+            border-radius: 100px;
+            margin-bottom: 36px;
+            background: rgba(0,212,255,0.04);
+        }
+        .hero-tag::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: blinkDot 2.5s ease-in-out infinite;
+        }
+        @keyframes blinkDot {
+            0%,100% { opacity:1; box-shadow: 0 0 8px var(--accent); }
+            50% { opacity:0.3; box-shadow: none; }
+        }
+        .hero-title {
+            font-family: var(--display);
+            font-size: clamp(72px, 16vw, 210px);
+            font-weight: 700;
+            line-height: 0.82;
+            letter-spacing: -0.025em;
+            text-transform: uppercase;
+            margin-bottom: 48px;
+        }
+        .hero-title .t1 { display: block; color: var(--text); }
+        .hero-title .t2 {
+            display: block;
+            background: linear-gradient(135deg, var(--accent), rgba(0,212,255,0.5));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-bottom {
+            display: flex;
+            align-items: flex-end;
+            gap: 64px;
+            flex-wrap: wrap;
+        }
+        .hero-desc {
+            font-size: 17px;
+            font-weight: 300;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 420px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(0,212,255,0.25);
+        }
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: var(--display);
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(.16,1,.3,1);
+            white-space: nowrap;
+        }
+        .btn-primary {
+            padding: 16px 32px;
+            background: var(--accent);
+            color: #000;
+            border: 1px solid var(--accent);
+        }
+        .btn-primary:hover {
+            background: #fff;
+            border-color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 16px 48px rgba(0,212,255,0.3);
+        }
+        .btn-ghost {
+            padding: 16px 32px;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-ghost:hover {
+            border-color: rgba(0,212,255,0.35);
+            color: var(--accent);
+        }
+        .hero-scroll {
+            margin-top: 80px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: var(--display);
+            font-size: 9px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .hero-scroll::before {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 48px;
+            background: linear-gradient(to bottom, transparent, var(--muted));
+            animation: scrollLine 2s ease-in-out infinite;
+        }
+        @keyframes scrollLine {
+            0%,100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
 
-        .img-reveal {
+        /* ──────────────────────────────
+           SECTION HEADERS
+        ────────────────────────────── */
+        .sec-tag {
+            font-family: var(--display);
+            font-size: 9px;
+            letter-spacing: 0.55em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sec-tag::after {
+            content: '';
+            flex: 0 0 40px;
+            height: 1px;
+            background: rgba(0,212,255,0.35);
+        }
+        .sec-title {
+            font-family: var(--display);
+            font-size: clamp(42px, 7vw, 88px);
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 0.88;
+            margin-bottom: 20px;
+        }
+        .sec-title .accent { color: var(--accent); }
+
+        /* ──────────────────────────────
+           SERVICES
+        ────────────────────────────── */
+        #services { padding: 120px 0 100px; }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-top: 60px;
+        }
+        .svc-card {
+            padding: 40px 32px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.45s cubic-bezier(.16,1,.3,1), border-color 0.3s, background 0.3s;
+        }
+        .svc-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .svc-card::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; right: -80px;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+            transition: transform 0.5s, opacity 0.5s;
+            opacity: 0;
+        }
+        .svc-card:hover { transform: translateY(-10px); border-color: rgba(0,212,255,0.22); background: var(--glass-hover); }
+        .svc-card:hover::before { opacity: 1; }
+        .svc-card:hover::after { opacity: 1; transform: scale(1.3); }
+        .svc-num {
+            position: absolute;
+            top: 20px; right: 24px;
+            font-family: var(--display);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.07);
+            font-weight: 700;
+        }
+        .svc-icon {
+            font-size: 32px;
+            margin-bottom: 28px;
+            display: block;
+        }
+        .svc-card h3 {
+            font-family: var(--display);
+            font-size: 26px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+        .svc-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        /* ──────────────────────────────
+           PREISE
+        ────────────────────────────── */
+        #preise {
+            padding: 120px 0 100px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,0.018) 40%, rgba(0,85,204,0.012) 70%, transparent 100%);
+        }
+        .price-note {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.7;
+            padding: 18px 22px;
+            border-left: 2px solid rgba(0,212,255,0.28);
+            background: rgba(0,212,255,0.025);
+            border-radius: 0 10px 10px 0;
+            margin: 44px 0 36px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 44px;
+        }
+        .tab-btn {
+            padding: 11px 22px;
+            font-family: var(--display);
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            color: var(--muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { border-color: rgba(0,212,255,0.3); color: var(--accent); }
+        .tab-btn.active {
+            background: rgba(0,212,255,0.08);
+            border-color: rgba(0,212,255,0.38);
+            color: var(--accent);
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .tab-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+        .price-card {
+            padding: 32px 28px;
+            position: relative;
+            transition: transform 0.35s cubic-bezier(.16,1,.3,1), border-color 0.3s;
+        }
+        .price-card:hover { transform: translateY(-6px); border-color: rgba(0,212,255,0.22); }
+        .price-card.featured {
+            border-color: rgba(0,212,255,0.28);
+            background: rgba(0,212,255,0.055);
+        }
+        .price-card.featured::before {
+            content: 'BELIEBT';
+            position: absolute;
+            top: -1px; right: 22px;
+            font-family: var(--display);
+            font-size: 8px;
+            letter-spacing: 0.35em;
+            background: var(--accent);
+            color: #000;
+            padding: 4px 10px 3px;
+            border-radius: 0 0 8px 8px;
+            font-weight: 700;
+        }
+        .p-label {
+            font-family: var(--display);
+            font-size: 9px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        .p-name {
+            font-family: var(--display);
+            font-size: 17px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+            color: var(--text);
+            line-height: 1.2;
+        }
+        .p-amount {
+            font-family: var(--display);
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .p-from {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .p-desc {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ──────────────────────────────
+           BEWERTUNGEN
+        ────────────────────────────── */
+        #bewertungen { padding: 120px 0 100px; }
+        .reviews-header {
+            display: flex;
+            align-items: flex-end;
+            gap: 40px;
+            margin: 48px 0;
+            flex-wrap: wrap;
+        }
+        .reviews-score {
+            font-family: var(--display);
+            font-size: 96px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+        .reviews-meta-right { padding-bottom: 8px; }
+        .reviews-stars { color: #ffd54f; font-size: 26px; letter-spacing: 3px; margin-bottom: 4px; }
+        .reviews-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .reviews-link {
+            font-family: var(--display);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .reviews-link:hover { opacity: 0.7; }
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 18px;
+        }
+        .review-card { padding: 28px; transition: transform 0.3s; }
+        .review-card:hover { transform: translateY(-4px); }
+        .rv-stars { color: #ffd54f; font-size: 13px; letter-spacing: 2px; margin-bottom: 14px; }
+        .rv-text {
+            font-size: 14px;
+            color: rgba(200,225,235,0.55);
+            line-height: 1.75;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .rv-author { display: flex; align-items: center; gap: 12px; }
+        .rv-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--display);
+            font-size: 13px; font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+        .rv-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .rv-date { font-size: 11px; color: var(--muted); }
+
+        /* ──────────────────────────────
+           ÜBER UNS
+        ────────────────────────────── */
+        #about { padding: 120px 0 100px; }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            margin-top: 60px;
+        }
+        .about-copy p {
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.85;
+            margin-bottom: 18px;
+        }
+        .about-copy strong { color: var(--text); font-weight: 600; }
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 40px;
+        }
+        .stat { padding: 20px 16px; text-align: center; }
+        .stat-n {
+            font-family: var(--display);
+            font-size: 34px; font-weight: 700;
+            color: var(--accent); line-height: 1;
+            margin-bottom: 6px;
+        }
+        .stat-l {
+            font-family: var(--display);
+            font-size: 9px; letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .about-img-wrap { position: relative; }
+        .about-img-wrap img {
+            width: 100%; aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 16px;
+            filter: grayscale(15%) brightness(0.75);
+            transition: filter 0.9s ease, transform 0.9s ease;
+        }
+        .about-img-wrap:hover img { filter: grayscale(0%) brightness(1); transform: scale(1.02); }
+        .about-img-wrap::after {
+            content: '';
             position: absolute;
             inset: 0;
+            border-radius: 16px;
+            background: linear-gradient(to top, rgba(3,5,9,0.6) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* ──────────────────────────────
+           KONTAKT
+        ────────────────────────────── */
+        #kontakt {
+            padding: 120px 0 100px;
+            background: linear-gradient(180deg, transparent, rgba(0,212,255,0.015) 50%, transparent);
+        }
+        .kontakt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            margin-top: 60px;
+            align-items: start;
+        }
+        .form-field { margin-bottom: 22px; }
+        .form-field label {
+            display: block;
+            font-family: var(--display);
+            font-size: 9px; letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .form-field input,
+        .form-field textarea,
+        .form-field select {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.1; /* Extreme Reduktion für maximalen Edel-Look */
-            transition: opacity 1s ease, transform 3s ease;
-            filter: grayscale(100%);
-        }
-        .horizontal-section:hover .img-reveal {
-            opacity: 0.25;
-            transform: scale(1.03);
-            filter: grayscale(0%);
-        }
-
-        .input-underlined {
-            background: transparent;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            color: #fff;
-            transition: 0.3s;
-        }
-        .input-underlined:focus {
-            border-color: #00ffcc;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.028);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 15px;
             outline: none;
+            transition: border-color 0.3s, background 0.3s;
+            -webkit-appearance: none;
         }
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-field select:focus {
+            border-color: rgba(0,212,255,0.38);
+            background: rgba(0,212,255,0.03);
+        }
+        .form-field select option { background: #060a10; }
+        .form-field textarea { resize: vertical; min-height: 110px; }
+        .form-dsgvo {
+            font-size: 12px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
+        }
+        .form-dsgvo a { color: var(--accent); text-decoration: none; }
+        .form-submit {
+            width: 100%;
+            padding: 17px;
+            background: var(--accent);
+            color: #000;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .form-submit:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,212,255,0.25); }
+        .contact-items { display: flex; flex-direction: column; gap: 14px; }
+        .ci {
+            display: flex; align-items: flex-start; gap: 16px;
+            padding: 22px 20px;
+            transition: border-color 0.3s;
+        }
+        .ci:hover { border-color: rgba(0,212,255,0.22); }
+        .ci-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.16);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .ci-lbl {
+            font-family: var(--display);
+            font-size: 9px; letter-spacing: 0.35em;
+            text-transform: uppercase; color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .ci-val {
+            color: var(--text); font-size: 14px;
+            text-decoration: none; transition: color 0.3s;
+        }
+        .ci-val:hover { color: var(--accent); }
+        .map-box {
+            border-radius: 14px; overflow: hidden;
+            height: 220px; margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.055);
+            filter: grayscale(80%) brightness(0.6) contrast(1.1);
+            transition: filter 0.8s ease;
+        }
+        .map-box:hover { filter: grayscale(0%) brightness(1) contrast(1); }
 
-        .instagram-grid img {
-            transition: transform 0.5s ease, filter 0.5s ease;
-            filter: grayscale(100%) brightness(0.6);
+        /* ──────────────────────────────
+           FOOTER
+        ────────────────────────────── */
+        footer {
+            padding: 56px 0 130px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            position: relative; z-index: 1;
         }
-        .instagram-grid img:hover {
-            transform: scale(1.05);
-            filter: grayscale(0%) brightness(1);
+        .footer-inner {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 20px; text-align: center;
+        }
+        .footer-logo {
+            font-family: var(--display);
+            font-size: 28px; font-weight: 700;
+            letter-spacing: 0.12em; color: var(--accent); opacity: 0.25;
+        }
+        .footer-links { display: flex; gap: 36px; flex-wrap: wrap; justify-content: center; }
+        .footer-links a {
+            font-family: var(--display);
+            font-size: 9px; letter-spacing: 0.45em;
+            text-transform: uppercase; color: var(--muted);
+            text-decoration: none; transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--text); }
+        .footer-copy { font-size: 11px; color: rgba(255,255,255,0.13); letter-spacing: 0.08em; }
+
+        /* ──────────────────────────────
+           FLOATING NAV
+        ────────────────────────────── */
+        #nav-pill {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex; align-items: center; gap: 18px;
+            padding: 14px 26px;
+            background: rgba(3,5,9,0.92);
+            backdrop-filter: blur(50px) saturate(180%);
+            -webkit-backdrop-filter: blur(50px) saturate(180%);
+            border: 1px solid rgba(0,212,255,0.18);
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.04), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #nav-pill:hover {
+            border-color: rgba(0,212,255,0.42);
+            box-shadow: 0 10px 48px rgba(0,212,255,0.14), 0 0 0 1px rgba(0,212,255,0.08);
+        }
+        .pill-brand {
+            font-family: var(--display);
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.18em; color: var(--accent);
+            text-transform: uppercase;
+        }
+        .pill-divider {
+            width: 1px; height: 16px;
+            background: rgba(255,255,255,0.1);
+        }
+        .pill-burger { display: flex; flex-direction: column; gap: 5px; width: 18px; cursor: pointer; }
+        .pill-burger span {
+            display: block; height: 1.5px;
+            background: rgba(220,240,250,0.75);
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(.16,1,.3,1);
+        }
+        #nav-pill.open .pill-burger span:nth-child(1) { transform: rotate(45deg) translate(4.5px, 4.5px); }
+        #nav-pill.open .pill-burger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        #nav-pill.open .pill-burger span:nth-child(3) { transform: rotate(-45deg) translate(4.5px, -4.5px); }
+
+        /* ──────────────────────────────
+           NAV OVERLAY
+        ────────────────────────────── */
+        #nav-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            background: rgba(3,5,9,0.97);
+            backdrop-filter: blur(48px);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(.16,1,.3,1);
+        }
+        #nav-overlay.open { opacity: 1; pointer-events: all; }
+        .nav-items { display: flex; flex-direction: column; gap: 4px; text-align: center; }
+        .nav-items a {
+            font-family: var(--display);
+            font-size: clamp(44px, 9vw, 80px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            color: rgba(255,255,255,0.08);
+            text-decoration: none;
+            line-height: 1.1;
+            transition: color 0.25s;
+        }
+        .nav-items a:hover { color: var(--accent); }
+        .nav-footer {
+            margin-top: 52px;
+            font-size: 13px; color: var(--muted);
+            letter-spacing: 0.15em; text-align: center;
+            line-height: 1.8;
+        }
+        .nav-footer a { color: var(--accent); text-decoration: none; }
+
+        /* ──────────────────────────────
+           COOKIE BANNER
+        ────────────────────────────── */
+        #cookie {
+            position: fixed;
+            bottom: 90px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 998;
+            width: min(540px, calc(100vw - 32px));
+            padding: 22px 26px;
+            background: rgba(4,7,12,0.97);
+            border: 1px solid rgba(0,212,255,0.14);
+            border-radius: 16px;
+            backdrop-filter: blur(40px);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        #cookie.hidden { opacity: 0; transform: translateX(-50%) translateY(16px); pointer-events: none; }
+        .cookie-txt {
+            font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 16px;
+        }
+        .cookie-txt a { color: var(--accent); text-decoration: none; }
+        .cookie-btns { display: flex; gap: 10px; }
+        .ck-accept {
+            padding: 10px 22px;
+            background: var(--accent); color: #000;
+            font-family: var(--display); font-size: 10px;
+            font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+            border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s;
+        }
+        .ck-accept:hover { background: #fff; }
+        .ck-decline {
+            padding: 10px 22px;
+            background: transparent; color: var(--muted);
+            font-family: var(--display); font-size: 10px;
+            letter-spacing: 0.22em; text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 8px; cursor: pointer; transition: all 0.3s;
+        }
+        .ck-decline:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+        /* ──────────────────────────────
+           RESPONSIVE
+        ────────────────────────────── */
+        @media (max-width: 900px) {
+            .about-grid { grid-template-columns: 1fr; gap: 48px; }
+            .kontakt-grid { grid-template-columns: 1fr; gap: 48px; }
+            .about-img-wrap { display: none; }
+        }
+        @media (max-width: 640px) {
+            .hero-bottom { flex-direction: column; gap: 36px; }
+            .price-grid { grid-template-columns: 1fr 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
+            .reviews-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 400px) {
+            .price-grid { grid-template-columns: 1fr; }
+        }
+        @media (pointer: coarse) {
+            body { cursor: auto; }
+            #cursor, #cursor-ring { display: none; }
         }
     </style>
 </head>
-<body class="overflow-x-hidden">
-    <div class="bg-animated"></div>
+<body>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference">
-        <div class="impact-font text-3xl tracking-wider accent-text">GLANZKRASS</div>
-        <div class="hidden md:flex space-x-10 text-[10px] uppercase tracking-[0.4em] font-bold">
-            <a href="#services" class="hover:accent-text transition">Leistungen</a>
-            <a href="#about" class="hover:accent-text transition">Über Uns</a>
-            <a href="#instagram" class="hover:accent-text transition">Journal</a>
-            <a href="#anfahrt" class="hover:accent-text transition">Standort</a>
-        </div>
-        <a href="#kontakt" class="border border-accent-text text-accent-text px-5 py-2 font-black text-xs uppercase tracking-widest hover:bg-accent-text hover:text-black transition">Kontakt</a>
+<!-- CUSTOM CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- RAIN CANVAS -->
+<canvas id="rain-canvas"></canvas>
+
+<!-- COOKIE -->
+<div id="cookie">
+    <p class="cookie-txt">
+        Diese Website verwendet Cookies für ein optimales Erlebnis.
+        Details in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.
+    </p>
+    <div class="cookie-btns">
+        <button class="ck-accept" onclick="cookieAccept()">Akzeptieren</button>
+        <button class="ck-decline" onclick="cookieDecline()">Ablehnen</button>
+    </div>
+</div>
+
+<!-- NAV OVERLAY -->
+<div id="nav-overlay">
+    <nav class="nav-items">
+        <a href="#services" onclick="navClose()">Leistungen</a>
+        <a href="#preise" onclick="navClose()">Preise</a>
+        <a href="#bewertungen" onclick="navClose()">Bewertungen</a>
+        <a href="#about" onclick="navClose()">Über Uns</a>
+        <a href="#kontakt" onclick="navClose()">Kontakt</a>
     </nav>
+    <div class="nav-footer">
+        <a href="tel:+4917828021918">+49 178 2802191</a><br>
+        <a href="mailto:info@glanzkrass.de">info@glanzkrass.de</a>
+    </div>
+</div>
 
-    <!-- Hero -->
-    <section class="min-h-screen relative flex items-center justify-center p-6">
-        <div class="absolute inset-0 z-0 overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black z-10"></div>
-            <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/174e01f3-6aff-4b54-bec6-cabc866100c1/image.jpg" class="w-full h-full object-cover opacity-10 grayscale scale-110">
-        </div>
+<!-- FLOATING NAV PILL -->
+<div id="nav-pill" onclick="navToggle()">
+    <span class="pill-brand">GlanzKrass</span>
+    <div class="pill-divider"></div>
+    <div class="pill-burger">
+        <span></span><span></span><span></span>
+    </div>
+</div>
 
-        <div class="relative z-10 max-w-7xl mx-auto w-full">
-            <div data-aos="fade-up">
-                <span class="inline-block px-4 py-1 bg-accent-text text-black text-[9px] font-black tracking-[0.6em] uppercase mb-10">Wellness für dein Auto</span>
-                <h1 class="impact-font text-7xl md:text-[14rem] leading-[0.75] mb-12 tracking-tighter uppercase">
-                    KRASSER<br><span class="accent-text opacity-70">GLANZ.</span>
-                </h1>
-                <div class="flex flex-col md:flex-row items-start gap-12">
-                    <p class="text-zinc-600 text-xl max-w-sm leading-relaxed font-light border-l border-accent-text/30 pl-8">
-                        Dein Spezialist für professionelle Autopflege im Papenteich. Präzision trifft auf Leidenschaft.
-                    </p>
-                    <a href="#services" class="text-accent-text impact-font text-3xl group flex items-center space-x-4">
-                        <span>ENTDECKE DEN UNTERSCHIED</span>
-                        <span class="transform group-hover:translate-x-3 transition">→</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Horizontal Slideshow (Leistungen) -->
-    <section id="services" class="pin-section relative bg-black">
-        <div class="horizontal-container">
-            <!-- Innenreinigung -->
-            <div class="horizontal-section relative overflow-hidden">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/4f01127f-68b5-44e9-b854-4c956611b040/image.jpg" class="img-reveal">
-                <div class="relative z-10 p-16 card-glass max-w-2xl border-l-2 border-l-accent-text">
-                    <h2 class="impact-font text-8xl mb-6">INNENRAUM.</h2>
-                    <p class="text-zinc-400 text-xl leading-relaxed">Tiefensauber & spürbar gepflegt. Wir entfernen gründlich Staub, Schmutz und Gerüche – hygienisch rein bis in die letzte Pore.</p>
-                </div>
-            </div>
-            <!-- Außenreinigung -->
-            <div class="horizontal-section relative overflow-hidden">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/230c22d7-6b9a-4838-812a-1c8f7cc1f110/image.jpg" class="img-reveal">
-                <div class="relative z-10 p-16 card-glass max-w-2xl border-l-2 border-l-accent-text">
-                    <h2 class="impact-font text-8xl mb-6">AUSSEN.</h2>
-                    <p class="text-zinc-400 text-xl leading-relaxed">Lackschonende Handwäsche vom Profi. Keine aggressiven Bürsten, keine Waschstraßenkratzer. Nur sanfte Reinigung.</p>
-                </div>
-            </div>
-            <!-- Lackaufbereitung -->
-            <div class="horizontal-section relative overflow-hidden">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/6f5e7835-a660-4c63-b5e2-f54ce86d4909/image.jpg" class="img-reveal">
-                <div class="relative z-10 p-16 card-glass max-w-2xl border-l-2 border-l-accent-text">
-                    <h2 class="impact-font text-8xl mb-6">POLITUR.</h2>
-                    <p class="text-zinc-400 text-xl leading-relaxed">Mehrstufiges Polieren für ein Finish wie Glas. Wir bringen stumpfen Lack wieder zum massiven Strahlen.</p>
-                </div>
-            </div>
-            <!-- Keramik -->
-            <div class="horizontal-section relative overflow-hidden">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/857e5a13-41d5-46d7-9b93-eabf1d49104b/image.jpg" class="img-reveal">
-                <div class="relative z-10 p-16 card-glass max-w-2xl border-l-2 border-l-accent-text">
-                    <h2 class="impact-font text-8xl mb-6">SCHUTZ.</h2>
-                    <p class="text-zinc-400 text-xl leading-relaxed">High-End Keramikversiegelung. Langanhaltender Schutz vor Umwelteinflüssen und extremer Tiefenglanz.</p>
-                </div>
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+    <div class="container">
+        <div class="hero-tag">Fahrzeugaufbereitung · Papenteich</div>
+        <h1 class="hero-title">
+            <span class="t1">Glanz</span>
+            <span class="t2">Krass.</span>
+        </h1>
+        <div class="hero-bottom">
+            <p class="hero-desc">
+                Dein Spezialist für professionelle Autopflege im Papenteich.
+                Lackpolitur, Keramikversiegelung, Innen- & Außenreinigung —
+                mit Leidenschaft und Präzision.
+            </p>
+            <div class="hero-actions">
+                <a href="#kontakt" class="btn btn-primary">Termin anfragen →</a>
+                <a href="#preise" class="btn btn-ghost">Preise ansehen</a>
             </div>
         </div>
-    </section>
+        <div class="hero-scroll">Scroll</div>
+    </div>
+</section>
 
-    <!-- Über Uns Section -->
-    <section id="about" class="py-48 px-6 bg-black">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24">
-            <div class="w-full md:w-1/2" data-aos="fade-right">
-                <h2 class="impact-font text-8xl mb-8 uppercase leading-none">WIR SIND<br><span class="accent-text">GLANZKRASS.</span></h2>
-                <div class="space-y-8 text-zinc-500 text-xl leading-relaxed font-light border-l border-zinc-800 pl-12">
-                    <p>Mein Name ist <span class="text-white font-bold uppercase">Mario Kirchner</span>.</p>
-                    <p>Willkommen bei Glanzkrass – deinem Spezialisten für professionelle Autopflege im Papenteich.</p>
-                    <p>Ob Innenreinigung, Lackpflege, komplette Fahrzeugaufbereitung oder Keramikversiegelung – wir bringen dein Auto auf Hochglanz. Mit Leidenschaft, Präzision und dem Blick fürs Detail sorgen wir dafür, dass dein Fahrzeug aussieht wie neu.</p>
-                </div>
+<!-- ═══════════════════════════ LEISTUNGEN ═══════════════════════════ -->
+<section id="services">
+    <div class="container">
+        <div class="reveal">
+            <div class="sec-tag">Was wir tun</div>
+            <h2 class="sec-title">Unsere<br><span class="accent">Leistungen.</span></h2>
+        </div>
+        <div class="services-grid">
+            <div class="glass svc-card reveal delay-1">
+                <span class="svc-num">01</span>
+                <span class="svc-icon">🧹</span>
+                <h3>Innenreinigung</h3>
+                <p>Tiefensauber bis in die letzte Pore. Staub, Schmutz und Gerüche werden gründlich entfernt — hygienisch rein.</p>
             </div>
-            <div class="w-full md:w-1/2 relative" data-aos="fade-left">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" class="grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition duration-1000 shadow-2xl">
+            <div class="glass svc-card reveal delay-2">
+                <span class="svc-num">02</span>
+                <span class="svc-icon">💧</span>
+                <h3>Außenreinigung</h3>
+                <p>Lackschonende Handwäsche vom Profi. Keine Kratzer, keine Bürsten — nur sanfte Präzisionspflege.</p>
+            </div>
+            <div class="glass svc-card reveal delay-1">
+                <span class="svc-num">03</span>
+                <span class="svc-icon">✨</span>
+                <h3>Lackpolitur</h3>
+                <p>Mehrstufiges Polieren für ein Finish wie Glas. Stumpfer Lack erstrahlt wieder in vollem Glanz.</p>
+            </div>
+            <div class="glass svc-card reveal delay-2">
+                <span class="svc-num">04</span>
+                <span class="svc-icon">🛡️</span>
+                <h3>Keramikversiegelung</h3>
+                <p>High-End Schutz für Lack, Scheiben und Felgen. Langanhaltend, hydrophob, extremer Tiefenglanz.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Instagram Feed Section -->
-    <section id="instagram" class="py-32 px-6 bg-black border-y border-white/5">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-end mb-16" data-aos="fade-up">
-                <h2 class="impact-font text-6xl uppercase">INSTAGRAM<br><span class="accent-text">JOURNAL.</span></h2>
-                <a href="https://www.instagram.com/glanzkrass/" target="_blank" class="text-[10px] tracking-[0.5em] uppercase hover:text-accent-text transition pb-4">@glanzkrass →</a>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 instagram-grid" data-aos="fade-up">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.2885-15/503811850_920326796862894_8142743900042759079_n.jpg?stp=dst-jpg_e15_p640x640_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=106&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=rzuJNW1hijgQ7kNvwEGN4dv&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AftgnZ689oGanJzQ5GbpCg0_Kwa8tJMjQ5L2uubzwVBEeg&oe=699F74A2&_nc_sid=8b3546" class="aspect-square object-cover w-full">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.2885-15/627304082_18327162745218226_3798620351250868736_n.jpg?stp=dst-jpg_e15_s640x640_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=ThOcjFxXx7oQ7kNvwEOGmFZ&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfuLn7v02Zi9Eq83_6qZF4JcT9dutVNHXuplAV1E_zxEOQ&oe=699F9610&_nc_sid=8b3546" class="aspect-square object-cover w-full">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.29350-15/467315989_475805608852109_3418687671541798236_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=YEy0k4iXkNoQ7kNvwFnUK-h&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_Aft9jDW7esxcwgpn584i-y6L6ePDKfHx9ft1YDPa7AGekg&oe=699F8FAB&_nc_sid=8b3546" class="aspect-square object-cover w-full">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.2885-15/601025869_18093534187938432_454146829951637234_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=oaMWU1E5GZ8Q7kNvwFeiOFu&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AftcVFjhRUoQXFOdXQW6N4vYWVCadEMHbBuYd8VTrraUGw&oe=699F74B3&_nc_sid=8b3546" class="aspect-square object-cover w-full">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.2885-15/587731148_735675629002123_6076452490543991495_n.jpg?stp=dst-jpg_e15_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=OJuocqIzoHYQ7kNvwGUqzgj&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_Aft_GtIK8F-lAcq7BzADMZfqvY0_08eh8NruuXexm2_eDw&oe=699F7450&_nc_sid=8b3546" class="aspect-square object-cover w-full">
-                <img src="https://scontent-ham3-1.cdninstagram.com/v/t51.2885-15/587778816_18091950409938432_5624858183325561664_n.jpg?stp=dst-jpg_e35_p640x640_sh0.08_tt6&_nc_ht=scontent-ham3-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QEVJUCtJYfw8BtgkprfdYCVzekbewUJnMPzxtUs5gnQHmh6k7nwxQSnYNro5KnObBw&_nc_ohc=rmmbc6JGlTEQ7kNvwEaqWtR&_nc_gid=Vmw5jsp5-XtjrLoRLA8pVQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_Afvindzg3nbfMmepRGQmnn6_yus7fn4VQthzTb37KEDQfg&oe=699F87FE&_nc_sid=8b3546" class="aspect-square object-cover w-full">
+<!-- ═══════════════════════════ PREISE ═══════════════════════════ -->
+<section id="preise">
+    <div class="container">
+        <div class="reveal">
+            <div class="sec-tag">Transparente Preise</div>
+            <h2 class="sec-title">Pakete &<br><span class="accent">Preise.</span></h2>
+        </div>
+        <div class="price-note reveal">
+            Jedes Fahrzeug ist einzigartig — der tatsächliche Aufwand wird nach individueller Begutachtung ermittelt.
+            Alle Preise sind Richtpreise ab-Preise, abhängig von Verschmutzungsgrad und Fahrzeugzustand.
+        </div>
+        <div class="tabs reveal">
+            <button class="tab-btn active" data-tab="kleinwagen">Kleinwagen</button>
+            <button class="tab-btn" data-tab="mittelklasse">Mittelklasse</button>
+            <button class="tab-btn" data-tab="oberklasse">Oberklasse & SUV</button>
+            <button class="tab-btn" data-tab="erweitertes">Erweitertes</button>
+        </div>
+
+        <div class="tab-pane active" id="tab-kleinwagen">
+            <p class="tab-subtitle">z.B. VW UP, Polo, Renault Clio, Ford Fiesta etc.</p>
+            <div class="price-grid">
+                <div class="glass price-card reveal">
+                    <div class="p-label">Paket 01</div>
+                    <div class="p-name">Innenreinigung Basic</div>
+                    <div class="p-amount">80€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
+                </div>
+                <div class="glass price-card reveal delay-1">
+                    <div class="p-label">Paket 02</div>
+                    <div class="p-name">Außenreinigung Basic</div>
+                    <div class="p-amount">70€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
+                </div>
+                <div class="glass price-card featured reveal delay-2">
+                    <div class="p-label">Paket 03</div>
+                    <div class="p-name">Lackpolitur & Versiegelung</div>
+                    <div class="p-amount">300€</div>
+                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
+                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
+                </div>
+                <div class="glass price-card reveal delay-3">
+                    <div class="p-label">Paket 04</div>
+                    <div class="p-name">Premium-Paket</div>
+                    <div class="p-amount">420€</div>
+                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
+                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Maps -->
-    <section id="anfahrt" class="py-32 px-6">
-        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-24 items-center">
-            <div data-aos="fade-right">
-                <h2 class="impact-font text-6xl mb-12 uppercase leading-none text-zinc-200">HIER SIND<br><span class="accent-text">WIR.</span></h2>
-                <div class="space-y-8 mb-16 font-light tracking-widest uppercase text-zinc-500 text-xs">
-                    <p>Am Moorkamp 8,<br>38527 Meine / Wedelheine</p>
-                    <p>+49 178 2802191</p>
+        <div class="tab-pane" id="tab-mittelklasse">
+            <p class="tab-subtitle">z.B. Audi A4, VW Golf, VW Passat, BMW 3er etc.</p>
+            <div class="price-grid">
+                <div class="glass price-card">
+                    <div class="p-label">Paket 01</div>
+                    <div class="p-name">Innenreinigung Basic</div>
+                    <div class="p-amount">110€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
                 </div>
-                <a href="https://www.google.com/maps/dir/?api=1&destination=Am+Moorkamp+8,+38527+Meine" target="_blank" class="inline-block accent-bg text-black impact-font text-2xl px-12 py-6 hover:bg-white transition uppercase tracking-wider">Navigieren →</a>
-            </div>
-            <div class="h-[500px] grayscale contrast-150 border border-white/5 opacity-40 hover:opacity-100 transition duration-1000">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <div class="glass price-card">
+                    <div class="p-label">Paket 02</div>
+                    <div class="p-name">Außenreinigung Basic</div>
+                    <div class="p-amount">90€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
+                </div>
+                <div class="glass price-card featured">
+                    <div class="p-label">Paket 03</div>
+                    <div class="p-name">Lackpolitur & Versiegelung</div>
+                    <div class="p-amount">380€</div>
+                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
+                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
+                </div>
+                <div class="glass price-card">
+                    <div class="p-label">Paket 04</div>
+                    <div class="p-name">Premium-Paket</div>
+                    <div class="p-amount">550€</div>
+                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
+                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Final Contact Form -->
-    <section id="kontakt" class="py-32 px-6 bg-zinc-950">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="impact-font text-8xl mb-16 uppercase tracking-tighter" data-aos="fade-up">KONTAKT.</h2>
-            <form class="grid grid-cols-1 md:grid-cols-2 gap-16 text-left" data-aos="fade-up">
-                <input type="text" placeholder="IHR NAME" class="input-underlined p-4 text-[10px] font-bold uppercase tracking-[0.4em]">
-                <input type="email" placeholder="IHR E-MAIL" class="input-underlined p-4 text-[10px] font-bold uppercase tracking-[0.4em]">
-                <div class="md:col-span-2">
-                    <textarea rows="3" placeholder="IHR FAHRZEUG & WÜNSCHE" class="input-underlined w-full p-4 text-[10px] font-bold uppercase tracking-[0.4em]"></textarea>
+        <div class="tab-pane" id="tab-oberklasse">
+            <p class="tab-subtitle">z.B. Audi A6/Q7, Mercedes E-Klasse, BMW 5er, SUV etc.</p>
+            <div class="price-grid">
+                <div class="glass price-card">
+                    <div class="p-label">Paket 01</div>
+                    <div class="p-name">Innenreinigung Basic</div>
+                    <div class="p-amount">120€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
                 </div>
-                <div class="md:col-span-2 text-center">
-                    <button type="submit" class="accent-bg text-black impact-font text-4xl px-24 py-8 hover:bg-white transition uppercase tracking-wider">Absenden</button>
+                <div class="glass price-card">
+                    <div class="p-label">Paket 02</div>
+                    <div class="p-name">Außenreinigung Basic</div>
+                    <div class="p-amount">110€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
                 </div>
+                <div class="glass price-card featured">
+                    <div class="p-label">Paket 03</div>
+                    <div class="p-name">Lackpolitur & Versiegelung</div>
+                    <div class="p-amount">450€</div>
+                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
+                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
+                </div>
+                <div class="glass price-card">
+                    <div class="p-label">Paket 04</div>
+                    <div class="p-name">Premium-Paket</div>
+                    <div class="p-amount">630€</div>
+                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
+                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="tab-erweitertes">
+            <p class="tab-subtitle">Ergänzende Leistungen für alle Fahrzeugklassen.</p>
+            <div class="price-grid">
+                <div class="glass price-card">
+                    <div class="p-label">Add-on 01</div>
+                    <div class="p-name">Scheibenversiegelung Frontscheibe</div>
+                    <div class="p-amount">50€</div>
+                    <div class="p-from">ab</div>
+                    <div class="p-desc">Dauerhaft deutlich bessere Sicht bei Regen und Spritzwasser.</div>
+                </div>
+                <div class="glass price-card">
+                    <div class="p-label">Add-on 02</div>
+                    <div class="p-name">Scheinwerfer&shy;aufbereitung</div>
+                    <div class="p-amount">50€</div>
+                    <div class="p-from">ab · pro Stück</div>
+                    <div class="p-desc">Vergilbte Scheinwerfer werden wieder kristallklar.</div>
+                </div>
+                <div class="glass price-card">
+                    <div class="p-label">Add-on 03</div>
+                    <div class="p-name">Keramikversiegelung Felgen</div>
+                    <div class="p-amount">45€</div>
+                    <div class="p-from">ab · pro Stück · bis 16 Monate Schutz</div>
+                    <div class="p-desc">Langanhaltender Schutz gegen Bremsenstaub und Schmutz.</div>
+                </div>
+                <div class="glass price-card featured">
+                    <div class="p-label">Add-on 04</div>
+                    <div class="p-name">Keramikversiegelung Lack</div>
+                    <div class="p-amount">370€</div>
+                    <div class="p-from">ab · Premium ab 490€</div>
+                    <div class="p-desc">Maximaler Langzeitschutz. Hydrophob, kratzresistent, extremer Tiefenglanz.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════ BEWERTUNGEN ═══════════════════════════ -->
+<section id="bewertungen">
+    <div class="container">
+        <div class="reveal">
+            <div class="sec-tag">Was Kunden sagen</div>
+            <h2 class="sec-title">Google<br><span class="accent">Bewertungen.</span></h2>
+        </div>
+        <div class="reviews-header reveal">
+            <div class="reviews-score">5.0</div>
+            <div class="reviews-meta-right">
+                <div class="reviews-stars">★★★★★</div>
+                <div class="reviews-sub">Basierend auf Google Bewertungen</div>
+                <a class="reviews-link" href="https://g.co/kgs/glanzkrass" target="_blank">Alle Bewertungen auf Google →</a>
+            </div>
+        </div>
+        <div class="reviews-grid">
+            <div class="glass review-card reveal">
+                <div class="rv-stars">★★★★★</div>
+                <p class="rv-text">"Absolut top! Mein Auto sieht aus wie neu. Mario ist super professionell und nimmt sich die Zeit, wirklich jeden Winkel zu bearbeiten. Absolute Weiterempfehlung!"</p>
+                <div class="rv-author">
+                    <div class="rv-avatar">TK</div>
+                    <div>
+                        <div class="rv-name">Thomas K.</div>
+                        <div class="rv-date">Google Rezension</div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass review-card reveal delay-1">
+                <div class="rv-stars">★★★★★</div>
+                <p class="rv-text">"Unglaubliches Ergebnis! Habe die Keramikversiegelung machen lassen — das Wasser perlt einfach ab und der Lack strahlt wie am ersten Tag. Mega zufrieden."</p>
+                <div class="rv-author">
+                    <div class="rv-avatar">SM</div>
+                    <div>
+                        <div class="rv-name">Sandra M.</div>
+                        <div class="rv-date">Google Rezension</div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass review-card reveal delay-2">
+                <div class="rv-stars">★★★★★</div>
+                <p class="rv-text">"Bestes Preis-Leistungs-Verhältnis in der Region. Mario arbeitet mit echter Leidenschaft. Mein SUV glänzt wie beim Neuwagenkauf — bin absolut begeistert!"</p>
+                <div class="rv-author">
+                    <div class="rv-avatar">JP</div>
+                    <div>
+                        <div class="rv-name">Jan P.</div>
+                        <div class="rv-date">Google Rezension</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════ ÜBER UNS ═══════════════════════════ -->
+<section id="about">
+    <div class="container">
+        <div class="reveal">
+            <div class="sec-tag">Über GlanzKrass</div>
+            <h2 class="sec-title">Wir sind<br><span class="accent">GlanzKrass.</span></h2>
+        </div>
+        <div class="about-grid">
+            <div class="about-copy reveal">
+                <p>Mein Name ist <strong>Mario Kirchner</strong>. Willkommen bei Glanzkrass — deinem Spezialisten für professionelle Autopflege im Papenteich.</p>
+                <p>Ob Innenreinigung, Lackpflege, komplette Fahrzeugaufbereitung oder Keramikversiegelung — ich bringe dein Auto auf Hochglanz. Mit Leidenschaft, Präzision und dem Blick fürs Detail sorge ich dafür, dass dein Fahrzeug aussieht wie neu.</p>
+                <p>Erlebe den Unterschied — Glanzkrass macht's möglich!</p>
+                <div class="about-stats">
+                    <div class="glass stat">
+                        <div class="stat-n">5★</div>
+                        <div class="stat-l">Google</div>
+                    </div>
+                    <div class="glass stat">
+                        <div class="stat-n">100%</div>
+                        <div class="stat-l">Handarbeit</div>
+                    </div>
+                    <div class="glass stat">
+                        <div class="stat-n">∞</div>
+                        <div class="stat-l">Leidenschaft</div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-img-wrap reveal delay-1">
+                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" alt="Mario Kirchner – GlanzKrass Fahrzeugaufbereitung" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════ KONTAKT ═══════════════════════════ -->
+<section id="kontakt">
+    <div class="container">
+        <div class="reveal">
+            <div class="sec-tag">Jetzt anfragen</div>
+            <h2 class="sec-title">Termin<br><span class="accent">Anfragen.</span></h2>
+        </div>
+        <div class="kontakt-grid">
+            <form class="reveal" onsubmit="formSubmit(event)">
+                <div class="form-field">
+                    <label>Ihr Name</label>
+                    <input type="text" required placeholder="Max Mustermann">
+                </div>
+                <div class="form-field">
+                    <label>Telefon oder E-Mail</label>
+                    <input type="text" required placeholder="+49 ... oder name@mail.de">
+                </div>
+                <div class="form-field">
+                    <label>Ihr Fahrzeug</label>
+                    <input type="text" placeholder="z.B. VW Golf VII, Baujahr 2019, schwarz">
+                </div>
+                <div class="form-field">
+                    <label>Gewünschte Leistung</label>
+                    <select>
+                        <option value="">Bitte wählen …</option>
+                        <option>Innenreinigung Basic</option>
+                        <option>Außenreinigung Basic</option>
+                        <option>Lackpolitur & Versiegelung</option>
+                        <option>Premium-Paket</option>
+                        <option>Keramikversiegelung Lack</option>
+                        <option>Keramikversiegelung Felgen</option>
+                        <option>Scheibenversiegelung</option>
+                        <option>Scheinwerferaufbereitung</option>
+                        <option>Sonstiges / Beratung</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Nachricht</label>
+                    <textarea placeholder="Weitere Details, Terminwünsche …"></textarea>
+                </div>
+                <p class="form-dsgvo">
+                    Mit dem Absenden stimmen Sie unserer <a href="datenschutz.html">Datenschutzerklärung</a> zu.
+                </p>
+                <button type="submit" class="form-submit">Anfrage senden →</button>
             </form>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="p-12 border-t border-white/5 text-center bg-black">
-        <div class="impact-font text-4xl mb-8 tracking-widest accent-text opacity-40">GLANZKRASS.</div>
-        <div class="flex justify-center space-x-12 text-zinc-700 text-[10px] tracking-[0.4em] uppercase mb-12">
-            <a href="impressum.html" class="hover:text-white transition">Impressum</a>
-            <a href="datenschutz.html" class="hover:text-white transition">Datenschutz</a>
-            <a href="https://www.instagram.com/glanzkrass/" target="_blank" class="hover:text-white transition">Instagram</a>
+            <div class="reveal delay-1">
+                <div class="contact-items">
+                    <div class="glass ci">
+                        <div class="ci-icon">📍</div>
+                        <div>
+                            <div class="ci-lbl">Adresse</div>
+                            <span class="ci-val">Am Moorkamp 8<br>38527 Meine / Wedelheine</span>
+                        </div>
+                    </div>
+                    <div class="glass ci">
+                        <div class="ci-icon">📞</div>
+                        <div>
+                            <div class="ci-lbl">Telefon</div>
+                            <a class="ci-val" href="tel:+4917828021918">+49 178 2802191</a>
+                        </div>
+                    </div>
+                    <div class="glass ci">
+                        <div class="ci-icon">✉️</div>
+                        <div>
+                            <div class="ci-lbl">E-Mail</div>
+                            <a class="ci-val" href="mailto:info@glanzkrass.de">info@glanzkrass.de</a>
+                        </div>
+                    </div>
+                    <div class="glass ci">
+                        <div class="ci-icon">📷</div>
+                        <div>
+                            <div class="ci-lbl">Instagram</div>
+                            <a class="ci-val" href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">@glanzkrass</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-box">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde"
+                        width="100%" height="100%"
+                        style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
         </div>
-        <div class="text-zinc-900 text-[8px] tracking-[0.6em] uppercase">
-            &copy; 2026 GLANZKRASS | MARIO KIRCHNER | AUTOMOTIVE EXCELLENCE
-        </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 1200, once: false });
-        gsap.registerPlugin(ScrollTrigger);
-        let sections = gsap.utils.toArray(".horizontal-section");
-        gsap.to(sections, {
-            xPercent: -100 * (sections.length - 1),
-            ease: "none",
-            scrollTrigger: {
-                trigger: ".pin-section",
-                pin: true,
-                scrub: 1,
-                snap: 1 / (sections.length - 1),
-                end: () => "+=" + document.querySelector(".horizontal-container").offsetWidth
-            }
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-logo">GLANZKRASS.</div>
+            <div class="footer-links">
+                <a href="impressum.html">Impressum</a>
+                <a href="datenschutz.html">Datenschutz</a>
+                <a href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">Instagram</a>
+                <a href="mailto:info@glanzkrass.de">E-Mail</a>
+                <a href="tel:+4917828021918">Telefon</a>
+            </div>
+            <div class="footer-copy">© 2026 GlanzKrass · Mario Kirchner · Am Moorkamp 8, 38527 Meine</div>
+        </div>
+    </div>
+</footer>
+
+<script>
+/* ═══════ CURSOR ═══════ */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+function animCursor() {
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a, button, .tab-btn').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        cur.style.width = '20px'; cur.style.height = '20px';
+        ring.style.width = '60px'; ring.style.height = '60px';
+        ring.style.borderColor = 'rgba(0,212,255,0.7)';
+    });
+    el.addEventListener('mouseleave', () => {
+        cur.style.width = '10px'; cur.style.height = '10px';
+        ring.style.width = '40px'; ring.style.height = '40px';
+        ring.style.borderColor = 'rgba(0,212,255,0.4)';
+    });
+});
+
+/* ═══════ RAIN CANVAS ═══════ */
+const canvas = document.getElementById('rain-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+let mouseX = -1000, mouseY = -1000;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+class Drop {
+    constructor() { this.reset(true); }
+    reset(init = false) {
+        this.x = Math.random() * W;
+        this.baseX = this.x;
+        this.y = init ? Math.random() * H : -30;
+        this.vy = 1.8 + Math.random() * 3.2;
+        this.len = 10 + Math.random() * 28;
+        this.alpha = 0.07 + Math.random() * 0.22;
+        this.w = 0.4 + Math.random() * 1.1;
+        this.phase = Math.random() * Math.PI * 2;
+        this.freq = 0.003 + Math.random() * 0.008;
+    }
+    update(t) {
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 180 && dist > 0) {
+            const f = (180 - dist) / 180 * 5;
+            this.x += (dx / dist) * f;
+        }
+        this.x += (this.baseX - this.x) * 0.015;
+        this.x += Math.sin(t * this.freq + this.phase) * 0.4;
+        this.y += this.vy;
+        if (this.y > H + 40) this.reset();
+    }
+    draw() {
+        const grad = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.len);
+        grad.addColorStop(0, `rgba(0,200,255,0)`);
+        grad.addColorStop(0.4, `rgba(0,212,255,${this.alpha})`);
+        grad.addColorStop(1, `rgba(150,235,255,0)`);
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x, this.y + this.len);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = this.w;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
+}
+
+const drops = Array.from({length: 200}, () => new Drop());
+let t = 0;
+
+function animRain() {
+    ctx.clearRect(0, 0, W, H);
+    t++;
+    drops.forEach(d => { d.update(t); d.draw(); });
+    requestAnimationFrame(animRain);
+}
+animRain();
+
+/* ═══════ NAV ═══════ */
+function navToggle() {
+    document.getElementById('nav-overlay').classList.toggle('open');
+    document.getElementById('nav-pill').classList.toggle('open');
+}
+function navClose() {
+    document.getElementById('nav-overlay').classList.remove('open');
+    document.getElementById('nav-pill').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') navClose(); });
+
+/* ═══════ TABS ═══════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+        // Re-trigger reveal for new cards
+        document.querySelectorAll('#tab-' + tab + ' .reveal').forEach(el => {
+            el.classList.remove('visible');
+            setTimeout(() => el.classList.add('visible'), 50);
         });
-    </script>
+    });
+});
+
+/* ═══════ SCROLL REVEAL ═══════ */
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ═══════ COOKIE ═══════ */
+function cookieAccept() {
+    document.getElementById('cookie').classList.add('hidden');
+    localStorage.setItem('gk_consent', '1');
+}
+function cookieDecline() {
+    document.getElementById('cookie').classList.add('hidden');
+    localStorage.setItem('gk_consent', '0');
+}
+if (localStorage.getItem('gk_consent') !== null) {
+    document.getElementById('cookie').classList.add('hidden');
+}
+
+/* ═══════ FORM ═══════ */
+function formSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = '✓ Anfrage gesendet!';
+    btn.style.background = '#00ff99';
+    btn.disabled = true;
+    setTimeout(() => {
+        btn.textContent = 'Anfrage senden →';
+        btn.style.background = '';
+        btn.disabled = false;
+        e.target.reset();
+    }, 4000);
+}
+</script>
 </body>
 </html>
