@@ -7,895 +7,564 @@
     <meta name="description" content="Glanzkrass – Dein Spezialist für professionelle Fahrzeugaufbereitung. Lackpolitur, Keramikversiegelung, Innen- & Außenreinigung. Papenteich / Meine.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg: #030509;
-            --bg2: #060a10;
             --accent: #00d4ff;
             --accent2: #0055cc;
-            --glass: rgba(255,255,255,0.035);
-            --glass-hover: rgba(255,255,255,0.06);
-            --glass-border: rgba(255,255,255,0.07);
-            --glass-border-accent: rgba(0,212,255,0.18);
-            --text: #ddeef5;
-            --muted: rgba(200,225,235,0.38);
-            --display: 'Chakra Petch', sans-serif;
-            --body: 'DM Sans', sans-serif;
+            --glass: rgba(255,255,255,0.038);
+            --glass-hover: rgba(255,255,255,0.065);
+            --glass-border: rgba(255,255,255,0.08);
+            --glass-border-accent: rgba(0,212,255,0.2);
+            --text: #e8f4f8;
+            /* CONTRAST FIX: raised from 0.38 → 0.7 for AA compliance */
+            --muted: rgba(210,232,244,0.72);
+            --muted-light: rgba(210,232,244,0.88);
         }
 
         html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; cursor: none; }
 
-        body {
-            font-family: var(--body);
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            cursor: none;
-        }
-
-        /* ── CUSTOM CURSOR ── */
-        #cursor {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%,-50%);
-            transition: transform 0.08s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
-            mix-blend-mode: screen;
-        }
-        #cursor-ring {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(0,212,255,0.4);
-            pointer-events: none;
-            z-index: 9998;
-            transform: translate(-50%,-50%);
-            transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
-        }
-        body:hover #cursor { opacity: 1; }
+        /* ── CURSOR ── */
+        #cur { position:fixed; width:10px; height:10px; border-radius:50%; background:var(--accent); pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:screen; transition:width .2s,height .2s; }
+        #cur-ring { position:fixed; width:40px; height:40px; border-radius:50%; border:1px solid rgba(0,212,255,.35); pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:width .3s,height .3s,border-color .3s; }
+        @media (pointer:coarse){ body{cursor:auto} #cur,#cur-ring{display:none} }
 
         /* ── CANVAS ── */
-        #rain-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
+        #rain { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
 
         /* ── GLASS ── */
         .glass {
             background: var(--glass);
-            backdrop-filter: blur(24px) saturate(160%);
-            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
         }
         .glass-accent {
-            background: rgba(0,212,255,0.05);
-            backdrop-filter: blur(32px) saturate(180%);
-            -webkit-backdrop-filter: blur(32px) saturate(180%);
-            border: 1px solid var(--glass-border-accent);
+            background: rgba(0,212,255,0.055);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(0,212,255,0.22);
             border-radius: 16px;
         }
 
-        /* ── LAYOUT ── */
-        section { position: relative; z-index: 1; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+        section { position:relative; z-index:1; }
+        .container { max-width:1200px; margin:0 auto; padding:0 28px; }
 
         /* ── REVEAL ── */
-        .reveal {
-            opacity: 0;
-            transform: translateY(36px);
-            transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
-        }
-        .reveal.delay-1 { transition-delay: 0.12s; }
-        .reveal.delay-2 { transition-delay: 0.24s; }
-        .reveal.delay-3 { transition-delay: 0.36s; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal { opacity:0; transform:translateY(32px); transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1); }
+        .reveal.d1{transition-delay:.1s} .reveal.d2{transition-delay:.2s} .reveal.d3{transition-delay:.3s}
+        .reveal.vis { opacity:1; transform:translateY(0); }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            HERO
-        ────────────────────────────── */
+        ════════════════════════════════ */
         #hero {
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            padding: 100px 28px 80px;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 28px 80px;
             position: relative;
             overflow: hidden;
         }
-        #hero::after {
-            content: '';
+
+        /* Hero background photo */
+        .hero-bg {
             position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 200px;
-            background: linear-gradient(to top, var(--bg), transparent);
-            pointer-events: none;
+            inset: 0;
+            background-image: url('assets/samuele-errico-piccarini-FMbWFDiVRPs-unsplash.jpg');
+            background-size: cover;
+            background-position: center 40%;
+            z-index: 0;
         }
-        .hero-glow {
-            position: absolute;
-            top: 10%;
-            left: -10%;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(0,212,255,0.055) 0%, transparent 65%);
-            pointer-events: none;
-            animation: glowPulse 8s ease-in-out infinite;
+        .hero-bg::after {
+            content:'';
+            position:absolute; inset:0;
+            background:
+                linear-gradient(to bottom, rgba(3,5,9,0.5) 0%, rgba(3,5,9,0.1) 40%, rgba(3,5,9,0.7) 75%, rgba(3,5,9,1) 100%),
+                linear-gradient(to right, rgba(3,5,9,0.6) 0%, transparent 60%);
         }
-        .hero-glow2 {
-            position: absolute;
-            bottom: 5%;
-            right: -5%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0,85,200,0.04) 0%, transparent 65%);
-            pointer-events: none;
-            animation: glowPulse 10s ease-in-out infinite reverse;
-        }
-        @keyframes glowPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.15); opacity: 0.7; }
-        }
+
+        .hero-inner { position:relative; z-index:1; max-width:1200px; margin:0 auto; width:100%; }
+
         .hero-tag {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            font-family: var(--display);
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 0.45em;
             text-transform: uppercase;
             color: var(--accent);
-            padding: 9px 18px 9px 14px;
-            border: 1px solid rgba(0,212,255,0.28);
+            padding: 8px 18px 8px 14px;
+            border: 1px solid rgba(0,212,255,.3);
             border-radius: 100px;
-            margin-bottom: 36px;
-            background: rgba(0,212,255,0.04);
+            background: rgba(0,212,255,.05);
+            margin-bottom: 32px;
         }
         .hero-tag::before {
-            content: '';
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 8px var(--accent);
-            animation: blinkDot 2.5s ease-in-out infinite;
+            content:''; width:7px; height:7px; border-radius:50%;
+            background:var(--accent); box-shadow:0 0 8px var(--accent);
+            animation: blink 2.5s ease-in-out infinite;
         }
-        @keyframes blinkDot {
-            0%,100% { opacity:1; box-shadow: 0 0 8px var(--accent); }
-            50% { opacity:0.3; box-shadow: none; }
-        }
-        .hero-title {
-            font-family: var(--display);
-            font-size: clamp(72px, 16vw, 210px);
-            font-weight: 700;
-            line-height: 0.82;
-            letter-spacing: -0.025em;
-            text-transform: uppercase;
-            margin-bottom: 48px;
-        }
-        .hero-title .t1 { display: block; color: var(--text); }
-        .hero-title .t2 {
+        @keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 8px var(--accent)} 50%{opacity:.3;box-shadow:none} }
+
+        /* ── 3D CHROME TEXT ── */
+        .hero-3d { margin-bottom: 8px; line-height: 1; }
+
+        .hero-line {
             display: block;
-            background: linear-gradient(135deg, var(--accent), rgba(0,212,255,0.5));
-            -webkit-background-clip: text;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: clamp(80px, 18vw, 240px);
+            font-weight: 700;
+            line-height: 0.86;
+            text-transform: uppercase;
+            letter-spacing: -0.025em;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-background-clip: text;
         }
-        .hero-bottom {
-            display: flex;
-            align-items: flex-end;
-            gap: 64px;
-            flex-wrap: wrap;
+
+        /* GLANZ — chrome metallic gradient + sweep animation */
+        .hl-glanz {
+            background-image: linear-gradient(
+                105deg,
+                #2a3f55 0%,
+                #5888a0 8%,
+                #9dc8dd 17%,
+                #d8eef8 25%,
+                #f0faff 31%,
+                #ffffff 37%,
+                #00d4ff 42%,
+                #88eeff 47%,
+                #ffffff 52%,
+                #cce8f4 58%,
+                #88b8cc 67%,
+                #3a5a70 78%,
+                #6898b0 87%,
+                #c0dded 94%,
+                #f8fcff 100%
+            );
+            background-size: 300% 100%;
+            animation: chrome-sweep 7s ease-in-out infinite;
+            filter:
+                drop-shadow(2px 2px 0 rgba(0,90,140,.98))
+                drop-shadow(4px 4px 0 rgba(0,65,105,.9))
+                drop-shadow(6px 6px 0 rgba(0,45,80,.82))
+                drop-shadow(8px 8px 0 rgba(0,28,58,.74))
+                drop-shadow(10px 10px 0 rgba(0,18,40,.65))
+                drop-shadow(13px 13px 22px rgba(0,0,20,.6));
         }
+
+        /* KRASS — car photo fills the letters */
+        .hl-krass {
+            background-image:
+                linear-gradient(105deg,
+                    rgba(0,212,255,.18) 0%,
+                    rgba(255,255,255,.28) 35%,
+                    rgba(0,180,230,.15) 65%,
+                    rgba(255,255,255,.22) 100%),
+                url('assets/eyosias-g-zHeaaWKo1B4-unsplash.jpg');
+            background-size: 300% 100%, 120% auto;
+            background-position: 0% center, center 35%;
+            background-blend-mode: overlay, normal;
+            animation: chrome-sweep 7s ease-in-out infinite;
+            filter:
+                drop-shadow(2px 2px 0 rgba(0,90,140,.98))
+                drop-shadow(4px 4px 0 rgba(0,65,105,.9))
+                drop-shadow(6px 6px 0 rgba(0,45,80,.82))
+                drop-shadow(8px 8px 0 rgba(0,28,58,.74))
+                drop-shadow(10px 10px 0 rgba(0,18,40,.65))
+                drop-shadow(13px 13px 22px rgba(0,0,20,.6));
+        }
+
+        @keyframes chrome-sweep {
+            0%,100% { background-position: 0% center, center 35%; }
+            50%      { background-position: 100% center, center 35%; }
+        }
+
+        /* Floor reflection */
+        .hero-reflect {
+            display: block;
+            height: clamp(40px, 6vw, 80px);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 44px;
+        }
+        .hero-reflect-inner {
+            transform: scaleY(-1);
+            opacity: 1;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.55) 0%, transparent 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.55) 0%, transparent 100%);
+            line-height: 1;
+        }
+        .hero-reflect-inner .hero-line {
+            animation: none !important;
+            background-position: 40% center, center 35% !important;
+            filter: none !important;
+            opacity: 0.5;
+        }
+
+        .hero-bottom { display:flex; align-items:flex-end; gap:56px; flex-wrap:wrap; }
         .hero-desc {
             font-size: 17px;
             font-weight: 300;
-            color: var(--muted);
+            color: var(--muted-light);
             line-height: 1.75;
-            max-width: 420px;
-            padding-left: 20px;
-            border-left: 2px solid rgba(0,212,255,0.25);
+            max-width: 400px;
+            padding-left: 18px;
+            border-left: 2px solid rgba(0,212,255,.3);
         }
-        .hero-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+        .hero-actions { display:flex; flex-direction:column; gap:12px; }
+
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            font-family: var(--display);
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(.16,1,.3,1);
-            white-space: nowrap;
+            display:inline-flex; align-items:center; gap:10px;
+            text-decoration:none;
+            font-family:'Chakra Petch', sans-serif; font-weight:600;
+            font-size:12px; letter-spacing:.2em; text-transform:uppercase;
+            border-radius:10px;
+            transition: all .3s cubic-bezier(.16,1,.3,1);
         }
-        .btn-primary {
-            padding: 16px 32px;
-            background: var(--accent);
-            color: #000;
-            border: 1px solid var(--accent);
-        }
-        .btn-primary:hover {
-            background: #fff;
-            border-color: #fff;
-            transform: translateY(-3px);
-            box-shadow: 0 16px 48px rgba(0,212,255,0.3);
-        }
-        .btn-ghost {
-            padding: 16px 32px;
-            background: transparent;
-            color: var(--muted);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .btn-ghost:hover {
-            border-color: rgba(0,212,255,0.35);
-            color: var(--accent);
-        }
+        .btn-primary { padding:16px 32px; background:var(--accent); color:#000; border:1px solid var(--accent); }
+        .btn-primary:hover { background:#fff; border-color:#fff; transform:translateY(-3px); box-shadow:0 16px 48px rgba(0,212,255,.32); }
+        .btn-ghost { padding:16px 32px; background:transparent; color:var(--muted-light); border:1px solid rgba(255,255,255,.14); }
+        .btn-ghost:hover { border-color:rgba(0,212,255,.4); color:var(--accent); }
+
         .hero-scroll {
-            margin-top: 80px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-family: var(--display);
-            font-size: 9px;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
+            margin-top:56px;
+            display:flex; align-items:center; gap:14px;
+            font-family:'Chakra Petch', sans-serif;
+            font-size:9px; letter-spacing:.5em; text-transform:uppercase;
             color: var(--muted);
         }
         .hero-scroll::before {
-            content: '';
-            display: block;
-            width: 1px;
-            height: 48px;
-            background: linear-gradient(to bottom, transparent, var(--muted));
-            animation: scrollLine 2s ease-in-out infinite;
+            content:''; display:block; width:1px; height:48px;
+            background:linear-gradient(to bottom, transparent, rgba(0,212,255,.5));
+            animation: scrollpulse 2s ease-in-out infinite;
         }
-        @keyframes scrollLine {
-            0%,100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
+        @keyframes scrollpulse { 0%,100%{opacity:.3} 50%{opacity:1} }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            SECTION HEADERS
-        ────────────────────────────── */
+        ════════════════════════════════ */
         .sec-tag {
-            font-family: var(--display);
-            font-size: 9px;
-            letter-spacing: 0.55em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-family:'Chakra Petch', sans-serif;
+            font-size:9px; letter-spacing:.55em; text-transform:uppercase;
+            color:var(--accent); margin-bottom:14px;
+            display:flex; align-items:center; gap:12px;
         }
-        .sec-tag::after {
-            content: '';
-            flex: 0 0 40px;
-            height: 1px;
-            background: rgba(0,212,255,0.35);
-        }
+        .sec-tag::after { content:''; flex:0 0 40px; height:1px; background:rgba(0,212,255,.38); }
         .sec-title {
-            font-family: var(--display);
-            font-size: clamp(42px, 7vw, 88px);
-            font-weight: 700;
-            text-transform: uppercase;
-            line-height: 0.88;
-            margin-bottom: 20px;
+            font-family:'Chakra Petch', sans-serif;
+            font-size:clamp(40px,7vw,86px); font-weight:700;
+            text-transform:uppercase; line-height:.88; margin-bottom:20px;
         }
-        .sec-title .accent { color: var(--accent); }
+        .sec-title .ac { color:var(--accent); }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            SERVICES
-        ────────────────────────────── */
-        #services { padding: 120px 0 100px; }
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-            margin-top: 60px;
-        }
+        ════════════════════════════════ */
+        #services { padding:120px 0 100px; }
+        .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-top:60px; }
+
         .svc-card {
-            padding: 40px 32px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.45s cubic-bezier(.16,1,.3,1), border-color 0.3s, background 0.3s;
+            padding:40px 32px;
+            position:relative; overflow:hidden;
+            transition:transform .45s cubic-bezier(.16,1,.3,1), border-color .3s, background .3s;
         }
+        .svc-bg {
+            position:absolute; inset:0;
+            background-size:cover; background-position:center;
+            opacity:.07; filter:grayscale(40%);
+            transition:opacity .55s ease, filter .55s ease;
+        }
+        .svc-card:hover .svc-bg { opacity:.2; filter:grayscale(0%); }
         .svc-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.4s;
+            content:''; position:absolute; top:0; left:0; right:0; height:1px;
+            background:linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity:0; transition:opacity .4s; z-index:2;
         }
-        .svc-card::after {
-            content: '';
-            position: absolute;
-            bottom: -80px; right: -80px;
-            width: 180px; height: 180px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
-            transition: transform 0.5s, opacity 0.5s;
-            opacity: 0;
+        .svc-card:hover { transform:translateY(-10px); border-color:rgba(0,212,255,.25); background:var(--glass-hover); }
+        .svc-card:hover::before { opacity:1; }
+        .svc-num { position:absolute; top:20px; right:24px; font-family:'Chakra Petch',sans-serif; font-size:10px; letter-spacing:.2em; color:rgba(255,255,255,.07); font-weight:700; z-index:2; }
+        .svc-icon { font-size:32px; margin-bottom:28px; display:block; position:relative; z-index:2; }
+        .svc-card h3 { font-family:'Chakra Petch',sans-serif; font-size:26px; font-weight:700; text-transform:uppercase; letter-spacing:.02em; margin-bottom:14px; color:var(--text); position:relative; z-index:2; }
+        .svc-card p { font-size:15px; color:var(--muted); line-height:1.75; position:relative; z-index:2; }
+
+        /* ════════════════════════════════
+           PHOTO STRIP
+        ════════════════════════════════ */
+        .photo-strip {
+            position: relative;
+            height: clamp(200px, 30vw, 420px);
+            overflow: hidden;
         }
-        .svc-card:hover { transform: translateY(-10px); border-color: rgba(0,212,255,0.22); background: var(--glass-hover); }
-        .svc-card:hover::before { opacity: 1; }
-        .svc-card:hover::after { opacity: 1; transform: scale(1.3); }
-        .svc-num {
-            position: absolute;
-            top: 20px; right: 24px;
-            font-family: var(--display);
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            color: rgba(255,255,255,0.07);
-            font-weight: 700;
+        .photo-strip img {
+            width:100%; height:100%; object-fit:cover; object-position:center 60%;
+            filter:grayscale(20%) brightness(.75);
+            transition: transform 8s ease, filter 8s ease;
         }
-        .svc-icon {
-            font-size: 32px;
-            margin-bottom: 28px;
-            display: block;
+        .photo-strip:hover img { transform:scale(1.04); filter:grayscale(0%) brightness(.9); }
+        .photo-strip-overlay {
+            position:absolute; inset:0;
+            background:
+                linear-gradient(to right, rgba(3,5,9,.7) 0%, transparent 30%, transparent 70%, rgba(3,5,9,.7) 100%),
+                linear-gradient(to bottom, rgba(3,5,9,.8) 0%, transparent 30%, transparent 70%, rgba(3,5,9,.8) 100%);
         }
-        .svc-card h3 {
-            font-family: var(--display);
-            font-size: 26px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            margin-bottom: 14px;
-            color: var(--text);
-        }
-        .svc-card p {
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.75;
+        .photo-strip-label {
+            position:absolute; bottom:32px; left:50%;
+            transform:translateX(-50%);
+            font-family:'Chakra Petch',sans-serif;
+            font-size:10px; letter-spacing:.55em; text-transform:uppercase;
+            color:rgba(255,255,255,.45);
+            white-space: nowrap;
         }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            PREISE
-        ────────────────────────────── */
+        ════════════════════════════════ */
         #preise {
-            padding: 120px 0 100px;
-            background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,0.018) 40%, rgba(0,85,204,0.012) 70%, transparent 100%);
+            padding:120px 0 100px;
+            background:linear-gradient(180deg, transparent 0%, rgba(0,212,255,.016) 40%, rgba(0,85,204,.01) 70%, transparent 100%);
         }
         .price-note {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.7;
-            padding: 18px 22px;
-            border-left: 2px solid rgba(0,212,255,0.28);
-            background: rgba(0,212,255,0.025);
-            border-radius: 0 10px 10px 0;
-            margin: 44px 0 36px;
+            font-size:14px; color:var(--muted); line-height:1.7;
+            padding:18px 22px;
+            border-left:2px solid rgba(0,212,255,.3);
+            background:rgba(0,212,255,.025);
+            border-radius:0 10px 10px 0;
+            margin:44px 0 36px;
         }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 44px;
-        }
+        .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:44px; }
         .tab-btn {
-            padding: 11px 22px;
-            font-family: var(--display);
-            font-size: 10px;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.07);
-            color: var(--muted);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding:11px 22px;
+            font-family:'Chakra Petch',sans-serif; font-size:10px;
+            letter-spacing:.25em; text-transform:uppercase;
+            background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07);
+            color:var(--muted); border-radius:8px; cursor:pointer; transition:all .3s;
         }
-        .tab-btn:hover { border-color: rgba(0,212,255,0.3); color: var(--accent); }
-        .tab-btn.active {
-            background: rgba(0,212,255,0.08);
-            border-color: rgba(0,212,255,0.38);
-            color: var(--accent);
+        .tab-btn:hover { border-color:rgba(0,212,255,.3); color:var(--accent); }
+        .tab-btn.active { background:rgba(0,212,255,.08); border-color:rgba(0,212,255,.4); color:var(--accent); }
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; }
+        .tab-sub { font-size:13px; color:var(--muted); letter-spacing:.06em; margin-bottom:32px; font-style:italic; }
+        .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+        .price-card { padding:32px 28px; position:relative; transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s; }
+        .price-card:hover { transform:translateY(-6px); border-color:rgba(0,212,255,.22); }
+        .price-card.hot { border-color:rgba(0,212,255,.3); background:rgba(0,212,255,.06); }
+        .price-card.hot::before {
+            content:'BELIEBT'; position:absolute; top:-1px; right:22px;
+            font-family:'Chakra Petch',sans-serif; font-size:8px; letter-spacing:.35em;
+            background:var(--accent); color:#000; padding:4px 10px 3px; border-radius:0 0 8px 8px; font-weight:700;
         }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
-        .tab-subtitle {
-            font-size: 12px;
-            color: var(--muted);
-            letter-spacing: 0.08em;
-            margin-bottom: 32px;
-            font-style: italic;
-        }
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 18px;
-        }
-        .price-card {
-            padding: 32px 28px;
-            position: relative;
-            transition: transform 0.35s cubic-bezier(.16,1,.3,1), border-color 0.3s;
-        }
-        .price-card:hover { transform: translateY(-6px); border-color: rgba(0,212,255,0.22); }
-        .price-card.featured {
-            border-color: rgba(0,212,255,0.28);
-            background: rgba(0,212,255,0.055);
-        }
-        .price-card.featured::before {
-            content: 'BELIEBT';
-            position: absolute;
-            top: -1px; right: 22px;
-            font-family: var(--display);
-            font-size: 8px;
-            letter-spacing: 0.35em;
-            background: var(--accent);
-            color: #000;
-            padding: 4px 10px 3px;
-            border-radius: 0 0 8px 8px;
-            font-weight: 700;
-        }
-        .p-label {
-            font-family: var(--display);
-            font-size: 9px;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 6px;
-        }
-        .p-name {
-            font-family: var(--display);
-            font-size: 17px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 22px;
-            color: var(--text);
-            line-height: 1.2;
-        }
-        .p-amount {
-            font-family: var(--display);
-            font-size: 52px;
-            font-weight: 700;
-            color: var(--accent);
-            line-height: 1;
-            margin-bottom: 2px;
-        }
-        .p-from {
-            font-size: 11px;
-            color: var(--muted);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            margin-bottom: 18px;
-        }
-        .p-desc {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.65;
-        }
+        .p-lbl { font-family:'Chakra Petch',sans-serif; font-size:9px; letter-spacing:.35em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+        .p-name { font-family:'Chakra Petch',sans-serif; font-size:16px; font-weight:700; text-transform:uppercase; margin-bottom:20px; color:var(--text); line-height:1.2; }
+        .p-amt { font-family:'Chakra Petch',sans-serif; font-size:52px; font-weight:700; color:var(--accent); line-height:1; margin-bottom:2px; }
+        .p-from { font-size:12px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:16px; }
+        .p-desc { font-size:14px; color:var(--muted); line-height:1.65; }
 
-        /* ──────────────────────────────
-           BEWERTUNGEN
-        ────────────────────────────── */
-        #bewertungen { padding: 120px 0 100px; }
-        .reviews-header {
-            display: flex;
-            align-items: flex-end;
-            gap: 40px;
-            margin: 48px 0;
-            flex-wrap: wrap;
-        }
-        .reviews-score {
-            font-family: var(--display);
-            font-size: 96px;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1;
-        }
-        .reviews-meta-right { padding-bottom: 8px; }
-        .reviews-stars { color: #ffd54f; font-size: 26px; letter-spacing: 3px; margin-bottom: 4px; }
-        .reviews-sub {
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 8px;
-        }
-        .reviews-link {
-            font-family: var(--display);
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            text-decoration: none;
-            transition: opacity 0.3s;
-        }
-        .reviews-link:hover { opacity: 0.7; }
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 18px;
-        }
-        .review-card { padding: 28px; transition: transform 0.3s; }
-        .review-card:hover { transform: translateY(-4px); }
-        .rv-stars { color: #ffd54f; font-size: 13px; letter-spacing: 2px; margin-bottom: 14px; }
-        .rv-text {
-            font-size: 14px;
-            color: rgba(200,225,235,0.55);
-            line-height: 1.75;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-        .rv-author { display: flex; align-items: center; gap: 12px; }
-        .rv-avatar {
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent2), var(--accent));
-            display: flex; align-items: center; justify-content: center;
-            font-family: var(--display);
-            font-size: 13px; font-weight: 700; color: #fff;
-            flex-shrink: 0;
-        }
-        .rv-name { font-size: 13px; font-weight: 500; color: var(--text); }
-        .rv-date { font-size: 11px; color: var(--muted); }
+        /* ════════════════════════════════
+           REVIEWS
+        ════════════════════════════════ */
+        #bewertungen { padding:120px 0 100px; }
+        .reviews-head { display:flex; align-items:flex-end; gap:40px; margin:48px 0; flex-wrap:wrap; }
+        .score { font-family:'Chakra Petch',sans-serif; font-size:96px; font-weight:700; color:var(--text); line-height:1; }
+        .score-right { padding-bottom:8px; }
+        .stars { color:#ffd54f; font-size:26px; letter-spacing:3px; margin-bottom:4px; }
+        .score-sub { font-size:14px; color:var(--muted); margin-bottom:8px; }
+        .score-link { font-family:'Chakra Petch',sans-serif; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent); text-decoration:none; transition:opacity .3s; }
+        .score-link:hover { opacity:.7; }
+        .rev-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; }
+        .rev-card { padding:28px; transition:transform .3s; }
+        .rev-card:hover { transform:translateY(-4px); }
+        .rv-stars { color:#ffd54f; font-size:13px; letter-spacing:2px; margin-bottom:14px; }
+        .rv-txt { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:20px; font-style:italic; }
+        .rv-auth { display:flex; align-items:center; gap:12px; }
+        .rv-av { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--accent)); display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+        .rv-name { font-size:13px; font-weight:500; color:var(--text); }
+        .rv-date { font-size:11px; color:var(--muted); }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            ÜBER UNS
-        ────────────────────────────── */
-        #about { padding: 120px 0 100px; }
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-            margin-top: 60px;
+        ════════════════════════════════ */
+        #about { padding:120px 0 100px; }
+        .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; margin-top:60px; }
+        .about-copy p { font-size:16px; color:var(--muted); line-height:1.85; margin-bottom:18px; }
+        .about-copy strong { color:var(--text); font-weight:600; }
+        .about-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px; }
+        .stat { padding:20px 16px; text-align:center; }
+        .stat-n { font-family:'Chakra Petch',sans-serif; font-size:34px; font-weight:700; color:var(--accent); line-height:1; margin-bottom:6px; }
+        .stat-l { font-family:'Chakra Petch',sans-serif; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); }
+        .about-img {
+            position:relative;
+            border-radius:16px; overflow:hidden;
         }
-        .about-copy p {
-            font-size: 16px;
-            color: var(--muted);
-            line-height: 1.85;
-            margin-bottom: 18px;
+        .about-img img {
+            width:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 30%;
+            filter:grayscale(10%) brightness(.7);
+            transition:filter .9s, transform .9s;
+            display:block;
         }
-        .about-copy strong { color: var(--text); font-weight: 600; }
-        .about-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 40px;
-        }
-        .stat { padding: 20px 16px; text-align: center; }
-        .stat-n {
-            font-family: var(--display);
-            font-size: 34px; font-weight: 700;
-            color: var(--accent); line-height: 1;
-            margin-bottom: 6px;
-        }
-        .stat-l {
-            font-family: var(--display);
-            font-size: 9px; letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-        .about-img-wrap { position: relative; }
-        .about-img-wrap img {
-            width: 100%; aspect-ratio: 3/4;
-            object-fit: cover;
-            border-radius: 16px;
-            filter: grayscale(15%) brightness(0.75);
-            transition: filter 0.9s ease, transform 0.9s ease;
-        }
-        .about-img-wrap:hover img { filter: grayscale(0%) brightness(1); transform: scale(1.02); }
-        .about-img-wrap::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            background: linear-gradient(to top, rgba(3,5,9,0.6) 0%, transparent 50%);
-            pointer-events: none;
+        .about-img:hover img { filter:grayscale(0%) brightness(.92); transform:scale(1.03); }
+        .about-img::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(to top, rgba(3,5,9,.65) 0%, transparent 50%);
+            pointer-events:none;
         }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            KONTAKT
-        ────────────────────────────── */
+        ════════════════════════════════ */
         #kontakt {
-            padding: 120px 0 100px;
-            background: linear-gradient(180deg, transparent, rgba(0,212,255,0.015) 50%, transparent);
+            padding:120px 0 100px;
+            background:linear-gradient(180deg,transparent,rgba(0,212,255,.015) 50%,transparent);
         }
-        .kontakt-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 64px;
-            margin-top: 60px;
-            align-items: start;
+        .kontakt-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; margin-top:60px; align-items:start; }
+        .ff { margin-bottom:22px; }
+        .ff label { display:block; font-family:'Chakra Petch',sans-serif; font-size:10px; letter-spacing:.32em; text-transform:uppercase; color:var(--muted-light); margin-bottom:8px; }
+        .ff input,.ff textarea,.ff select {
+            width:100%; padding:14px 16px;
+            background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.09);
+            border-radius:10px; color:var(--text); font-family:'DM Sans',sans-serif;
+            font-size:15px; outline:none;
+            transition:border-color .3s,background .3s; -webkit-appearance:none;
         }
-        .form-field { margin-bottom: 22px; }
-        .form-field label {
-            display: block;
-            font-family: var(--display);
-            font-size: 9px; letter-spacing: 0.35em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 8px;
+        .ff input:focus,.ff textarea:focus,.ff select:focus { border-color:rgba(0,212,255,.42); background:rgba(0,212,255,.03); }
+        .ff select option { background:#060a10; }
+        .ff textarea { resize:vertical; min-height:110px; }
+        .f-dsgvo { font-size:12px; color:var(--muted); margin-bottom:18px; line-height:1.6; }
+        .f-dsgvo a { color:var(--accent); text-decoration:none; }
+        .f-submit {
+            width:100%; padding:17px;
+            background:var(--accent); color:#000;
+            font-family:'Chakra Petch',sans-serif; font-weight:700;
+            font-size:13px; letter-spacing:.2em; text-transform:uppercase;
+            border:none; border-radius:10px; cursor:pointer;
+            transition:all .3s;
         }
-        .form-field input,
-        .form-field textarea,
-        .form-field select {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.028);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 10px;
-            color: var(--text);
-            font-family: var(--body);
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.3s, background 0.3s;
-            -webkit-appearance: none;
-        }
-        .form-field input:focus,
-        .form-field textarea:focus,
-        .form-field select:focus {
-            border-color: rgba(0,212,255,0.38);
-            background: rgba(0,212,255,0.03);
-        }
-        .form-field select option { background: #060a10; }
-        .form-field textarea { resize: vertical; min-height: 110px; }
-        .form-dsgvo {
-            font-size: 12px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
-        }
-        .form-dsgvo a { color: var(--accent); text-decoration: none; }
-        .form-submit {
-            width: 100%;
-            padding: 17px;
-            background: var(--accent);
-            color: #000;
-            font-family: var(--display);
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .form-submit:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,212,255,0.25); }
-        .contact-items { display: flex; flex-direction: column; gap: 14px; }
+        .f-submit:hover { background:#fff; transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,212,255,.26); }
+
+        .ci-list { display:flex; flex-direction:column; gap:14px; }
         .ci {
-            display: flex; align-items: flex-start; gap: 16px;
-            padding: 22px 20px;
-            transition: border-color 0.3s;
+            display:flex; align-items:flex-start; gap:16px;
+            padding:22px 20px; transition:border-color .3s;
         }
-        .ci:hover { border-color: rgba(0,212,255,0.22); }
-        .ci-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            background: rgba(0,212,255,0.08);
-            border: 1px solid rgba(0,212,255,0.16);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
-        }
-        .ci-lbl {
-            font-family: var(--display);
-            font-size: 9px; letter-spacing: 0.35em;
-            text-transform: uppercase; color: var(--muted);
-            margin-bottom: 4px;
-        }
-        .ci-val {
-            color: var(--text); font-size: 14px;
-            text-decoration: none; transition: color 0.3s;
-        }
-        .ci-val:hover { color: var(--accent); }
-        .map-box {
-            border-radius: 14px; overflow: hidden;
-            height: 220px; margin-top: 20px;
-            border: 1px solid rgba(255,255,255,0.055);
-            filter: grayscale(80%) brightness(0.6) contrast(1.1);
-            transition: filter 0.8s ease;
-        }
-        .map-box:hover { filter: grayscale(0%) brightness(1) contrast(1); }
+        .ci:hover { border-color:rgba(0,212,255,.24); }
+        .ci-ico { width:44px; height:44px; border-radius:10px; background:rgba(0,212,255,.09); border:1px solid rgba(0,212,255,.18); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+        .ci-lbl { font-family:'Chakra Petch',sans-serif; font-size:9px; letter-spacing:.35em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+        .ci-val { color:var(--text); font-size:14px; text-decoration:none; transition:color .3s; line-height:1.5; display:block; }
+        .ci-val:hover { color:var(--accent); }
 
-        /* ──────────────────────────────
+        .map-wrap {
+            border-radius:14px; overflow:hidden; height:220px; margin-top:20px;
+            border:1px solid rgba(255,255,255,.055);
+            filter:grayscale(80%) brightness(.6) contrast(1.1);
+            transition:filter .8s;
+        }
+        .map-wrap:hover { filter:grayscale(0%) brightness(1) contrast(1); }
+
+        /* ════════════════════════════════
            FOOTER
-        ────────────────────────────── */
-        footer {
-            padding: 56px 0 130px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            position: relative; z-index: 1;
-        }
-        .footer-inner {
-            display: flex; flex-direction: column;
-            align-items: center; gap: 20px; text-align: center;
-        }
-        .footer-logo {
-            font-family: var(--display);
-            font-size: 28px; font-weight: 700;
-            letter-spacing: 0.12em; color: var(--accent); opacity: 0.25;
-        }
-        .footer-links { display: flex; gap: 36px; flex-wrap: wrap; justify-content: center; }
-        .footer-links a {
-            font-family: var(--display);
-            font-size: 9px; letter-spacing: 0.45em;
-            text-transform: uppercase; color: var(--muted);
-            text-decoration: none; transition: color 0.3s;
-        }
-        .footer-links a:hover { color: var(--text); }
-        .footer-copy { font-size: 11px; color: rgba(255,255,255,0.13); letter-spacing: 0.08em; }
+        ════════════════════════════════ */
+        footer { padding:56px 0 130px; border-top:1px solid rgba(255,255,255,.04); position:relative; z-index:1; }
+        .footer-inner { display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; }
+        .f-logo { font-family:'Chakra Petch',sans-serif; font-size:28px; font-weight:700; letter-spacing:.12em; color:var(--accent); opacity:.22; }
+        .f-links { display:flex; gap:36px; flex-wrap:wrap; justify-content:center; }
+        .f-links a { font-family:'Chakra Petch',sans-serif; font-size:9px; letter-spacing:.45em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .3s; }
+        .f-links a:hover { color:var(--text); }
+        .f-copy { font-size:11px; color:rgba(255,255,255,.15); letter-spacing:.08em; }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            FLOATING NAV
-        ────────────────────────────── */
+        ════════════════════════════════ */
         #nav-pill {
-            position: fixed;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex; align-items: center; gap: 18px;
-            padding: 14px 26px;
-            background: rgba(3,5,9,0.92);
-            backdrop-filter: blur(50px) saturate(180%);
-            -webkit-backdrop-filter: blur(50px) saturate(180%);
-            border: 1px solid rgba(0,212,255,0.18);
-            border-radius: 100px;
-            cursor: pointer;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.04), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+            z-index:1000; display:flex; align-items:center; gap:18px;
+            padding:14px 26px;
+            background:rgba(3,5,9,.93);
+            backdrop-filter:blur(50px) saturate(180%);
+            -webkit-backdrop-filter:blur(50px) saturate(180%);
+            border:1px solid rgba(0,212,255,.2); border-radius:100px; cursor:pointer;
+            box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 0 1px rgba(0,212,255,.04),inset 0 1px 0 rgba(255,255,255,.05);
+            transition:border-color .3s,box-shadow .3s;
         }
-        #nav-pill:hover {
-            border-color: rgba(0,212,255,0.42);
-            box-shadow: 0 10px 48px rgba(0,212,255,0.14), 0 0 0 1px rgba(0,212,255,0.08);
-        }
-        .pill-brand {
-            font-family: var(--display);
-            font-size: 11px; font-weight: 700;
-            letter-spacing: 0.18em; color: var(--accent);
-            text-transform: uppercase;
-        }
-        .pill-divider {
-            width: 1px; height: 16px;
-            background: rgba(255,255,255,0.1);
-        }
-        .pill-burger { display: flex; flex-direction: column; gap: 5px; width: 18px; cursor: pointer; }
-        .pill-burger span {
-            display: block; height: 1.5px;
-            background: rgba(220,240,250,0.75);
-            border-radius: 2px;
-            transition: all 0.3s cubic-bezier(.16,1,.3,1);
-        }
-        #nav-pill.open .pill-burger span:nth-child(1) { transform: rotate(45deg) translate(4.5px, 4.5px); }
-        #nav-pill.open .pill-burger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-        #nav-pill.open .pill-burger span:nth-child(3) { transform: rotate(-45deg) translate(4.5px, -4.5px); }
+        #nav-pill:hover { border-color:rgba(0,212,255,.45); box-shadow:0 10px 48px rgba(0,212,255,.15); }
+        .pill-brand { font-family:'Chakra Petch',sans-serif; font-size:11px; font-weight:700; letter-spacing:.18em; color:var(--accent); text-transform:uppercase; }
+        .pill-div { width:1px; height:16px; background:rgba(255,255,255,.1); }
+        .pill-burger { display:flex; flex-direction:column; gap:5px; width:18px; }
+        .pill-burger span { display:block; height:1.5px; background:rgba(220,240,250,.75); border-radius:2px; transition:all .3s cubic-bezier(.16,1,.3,1); }
+        #nav-pill.open .pill-burger span:nth-child(1) { transform:rotate(45deg) translate(4.5px,4.5px); }
+        #nav-pill.open .pill-burger span:nth-child(2) { opacity:0; transform:scaleX(0); }
+        #nav-pill.open .pill-burger span:nth-child(3) { transform:rotate(-45deg) translate(4.5px,-4.5px); }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            NAV OVERLAY
-        ────────────────────────────── */
-        #nav-overlay {
-            position: fixed; inset: 0; z-index: 999;
-            background: rgba(3,5,9,0.97);
-            backdrop-filter: blur(48px);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(.16,1,.3,1);
+        ════════════════════════════════ */
+        #nav-ov {
+            position:fixed; inset:0; z-index:999;
+            background:rgba(3,5,9,.97); backdrop-filter:blur(48px);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity .4s cubic-bezier(.16,1,.3,1);
         }
-        #nav-overlay.open { opacity: 1; pointer-events: all; }
-        .nav-items { display: flex; flex-direction: column; gap: 4px; text-align: center; }
-        .nav-items a {
-            font-family: var(--display);
-            font-size: clamp(44px, 9vw, 80px);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.01em;
-            color: rgba(255,255,255,0.08);
-            text-decoration: none;
-            line-height: 1.1;
-            transition: color 0.25s;
-        }
-        .nav-items a:hover { color: var(--accent); }
-        .nav-footer {
-            margin-top: 52px;
-            font-size: 13px; color: var(--muted);
-            letter-spacing: 0.15em; text-align: center;
-            line-height: 1.8;
-        }
-        .nav-footer a { color: var(--accent); text-decoration: none; }
+        #nav-ov.open { opacity:1; pointer-events:all; }
+        .nav-items { display:flex; flex-direction:column; gap:4px; text-align:center; }
+        .nav-items a { font-family:'Chakra Petch',sans-serif; font-size:clamp(44px,9vw,80px); font-weight:700; text-transform:uppercase; letter-spacing:.01em; color:rgba(255,255,255,.08); text-decoration:none; line-height:1.1; transition:color .25s; }
+        .nav-items a:hover { color:var(--accent); }
+        .nav-foot { margin-top:52px; font-size:13px; color:var(--muted); letter-spacing:.15em; text-align:center; line-height:1.8; }
+        .nav-foot a { color:var(--accent); text-decoration:none; }
 
-        /* ──────────────────────────────
-           COOKIE BANNER
-        ────────────────────────────── */
+        /* ════════════════════════════════
+           COOKIE
+        ════════════════════════════════ */
         #cookie {
-            position: fixed;
-            bottom: 90px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 998;
-            width: min(540px, calc(100vw - 32px));
-            padding: 22px 26px;
-            background: rgba(4,7,12,0.97);
-            border: 1px solid rgba(0,212,255,0.14);
-            border-radius: 16px;
-            backdrop-filter: blur(40px);
-            box-shadow: 0 24px 64px rgba(0,0,0,0.55);
-            transition: opacity 0.4s, transform 0.4s;
+            position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+            z-index:998; width:min(540px,calc(100vw - 32px));
+            padding:22px 26px;
+            background:rgba(4,7,12,.97); border:1px solid rgba(0,212,255,.14);
+            border-radius:16px; backdrop-filter:blur(40px);
+            box-shadow:0 24px 64px rgba(0,0,0,.55);
+            transition:opacity .4s,transform .4s;
         }
-        #cookie.hidden { opacity: 0; transform: translateX(-50%) translateY(16px); pointer-events: none; }
-        .cookie-txt {
-            font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 16px;
-        }
-        .cookie-txt a { color: var(--accent); text-decoration: none; }
-        .cookie-btns { display: flex; gap: 10px; }
-        .ck-accept {
-            padding: 10px 22px;
-            background: var(--accent); color: #000;
-            font-family: var(--display); font-size: 10px;
-            font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
-            border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s;
-        }
-        .ck-accept:hover { background: #fff; }
-        .ck-decline {
-            padding: 10px 22px;
-            background: transparent; color: var(--muted);
-            font-family: var(--display); font-size: 10px;
-            letter-spacing: 0.22em; text-transform: uppercase;
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 8px; cursor: pointer; transition: all 0.3s;
-        }
-        .ck-decline:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+        #cookie.hidden { opacity:0; transform:translateX(-50%) translateY(16px); pointer-events:none; }
+        .ck-txt { font-size:13px; color:var(--muted); line-height:1.65; margin-bottom:16px; }
+        .ck-txt a { color:var(--accent); text-decoration:none; }
+        .ck-btns { display:flex; gap:10px; }
+        .ck-yes { padding:10px 22px; background:var(--accent); color:#000; font-family:'Chakra Petch',sans-serif; font-size:10px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; border:none; border-radius:8px; cursor:pointer; transition:background .3s; }
+        .ck-yes:hover { background:#fff; }
+        .ck-no { padding:10px 22px; background:transparent; color:var(--muted); font-family:'Chakra Petch',sans-serif; font-size:10px; letter-spacing:.22em; text-transform:uppercase; border:1px solid rgba(255,255,255,.09); border-radius:8px; cursor:pointer; transition:all .3s; }
+        .ck-no:hover { border-color:rgba(255,255,255,.25); color:var(--text); }
 
-        /* ──────────────────────────────
+        /* ════════════════════════════════
            RESPONSIVE
-        ────────────────────────────── */
-        @media (max-width: 900px) {
-            .about-grid { grid-template-columns: 1fr; gap: 48px; }
-            .kontakt-grid { grid-template-columns: 1fr; gap: 48px; }
-            .about-img-wrap { display: none; }
-        }
-        @media (max-width: 640px) {
-            .hero-bottom { flex-direction: column; gap: 36px; }
-            .price-grid { grid-template-columns: 1fr 1fr; }
-            .services-grid { grid-template-columns: 1fr; }
-            .reviews-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 400px) {
-            .price-grid { grid-template-columns: 1fr; }
-        }
-        @media (pointer: coarse) {
-            body { cursor: auto; }
-            #cursor, #cursor-ring { display: none; }
-        }
+        ════════════════════════════════ */
+        @media(max-width:900px){ .about-grid{grid-template-columns:1fr;gap:48px} .kontakt-grid{grid-template-columns:1fr;gap:48px} .about-img{display:none} }
+        @media(max-width:640px){ .hero-bottom{flex-direction:column;gap:32px} .price-grid{grid-template-columns:1fr 1fr} .services-grid{grid-template-columns:1fr} .rev-grid{grid-template-columns:1fr} }
+        @media(max-width:400px){ .price-grid{grid-template-columns:1fr} }
     </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
-
-<!-- RAIN CANVAS -->
-<canvas id="rain-canvas"></canvas>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="rain"></canvas>
 
 <!-- COOKIE -->
 <div id="cookie">
-    <p class="cookie-txt">
-        Diese Website verwendet Cookies für ein optimales Erlebnis.
-        Details in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.
-    </p>
-    <div class="cookie-btns">
-        <button class="ck-accept" onclick="cookieAccept()">Akzeptieren</button>
-        <button class="ck-decline" onclick="cookieDecline()">Ablehnen</button>
+    <p class="ck-txt">Diese Website verwendet Cookies für ein optimales Erlebnis. Details in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+    <div class="ck-btns">
+        <button class="ck-yes" onclick="ckAccept()">Akzeptieren</button>
+        <button class="ck-no" onclick="ckDecline()">Ablehnen</button>
     </div>
 </div>
 
 <!-- NAV OVERLAY -->
-<div id="nav-overlay">
+<div id="nav-ov">
     <nav class="nav-items">
         <a href="#services" onclick="navClose()">Leistungen</a>
         <a href="#preise" onclick="navClose()">Preise</a>
@@ -903,31 +572,39 @@
         <a href="#about" onclick="navClose()">Über Uns</a>
         <a href="#kontakt" onclick="navClose()">Kontakt</a>
     </nav>
-    <div class="nav-footer">
+    <div class="nav-foot">
         <a href="tel:+4917828021918">+49 178 2802191</a><br>
         <a href="mailto:info@glanzkrass.de">info@glanzkrass.de</a>
     </div>
 </div>
 
-<!-- FLOATING NAV PILL -->
 <div id="nav-pill" onclick="navToggle()">
     <span class="pill-brand">GlanzKrass</span>
-    <div class="pill-divider"></div>
-    <div class="pill-burger">
-        <span></span><span></span><span></span>
-    </div>
+    <div class="pill-div"></div>
+    <div class="pill-burger"><span></span><span></span><span></span></div>
 </div>
 
-<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<!-- ════ HERO ════ -->
 <section id="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-glow2"></div>
-    <div class="container">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+
         <div class="hero-tag">Fahrzeugaufbereitung · Papenteich</div>
-        <h1 class="hero-title">
-            <span class="t1">Glanz</span>
-            <span class="t2">Krass.</span>
-        </h1>
+
+        <!-- 3D CHROME TEXT -->
+        <div class="hero-3d">
+            <span class="hero-line hl-glanz">Glanz</span>
+            <span class="hero-line hl-krass">Krass.</span>
+        </div>
+
+        <!-- FLOOR REFLECTION -->
+        <div class="hero-reflect">
+            <div class="hero-reflect-inner">
+                <span class="hero-line hl-glanz">Glanz</span>
+                <span class="hero-line hl-krass">Krass.</span>
+            </div>
+        </div>
+
         <div class="hero-bottom">
             <p class="hero-desc">
                 Dein Spezialist für professionelle Autopflege im Papenteich.
@@ -939,261 +616,171 @@
                 <a href="#preise" class="btn btn-ghost">Preise ansehen</a>
             </div>
         </div>
+
         <div class="hero-scroll">Scroll</div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ LEISTUNGEN ═══════════════════════════ -->
+<!-- ════ LEISTUNGEN ════ -->
 <section id="services">
     <div class="container">
         <div class="reveal">
             <div class="sec-tag">Was wir tun</div>
-            <h2 class="sec-title">Unsere<br><span class="accent">Leistungen.</span></h2>
+            <h2 class="sec-title">Unsere<br><span class="ac">Leistungen.</span></h2>
         </div>
         <div class="services-grid">
-            <div class="glass svc-card reveal delay-1">
+
+            <div class="glass svc-card reveal d1">
+                <div class="svc-bg" style="background-image:url('assets/zac-nielson-8k_T1EwTySs-unsplash.jpg')"></div>
                 <span class="svc-num">01</span>
                 <span class="svc-icon">🧹</span>
                 <h3>Innenreinigung</h3>
                 <p>Tiefensauber bis in die letzte Pore. Staub, Schmutz und Gerüche werden gründlich entfernt — hygienisch rein.</p>
             </div>
-            <div class="glass svc-card reveal delay-2">
+
+            <div class="glass svc-card reveal d2">
+                <div class="svc-bg" style="background-image:url('assets/zac-nielson-m5g2IFRouCs-unsplash.jpg')"></div>
                 <span class="svc-num">02</span>
                 <span class="svc-icon">💧</span>
                 <h3>Außenreinigung</h3>
-                <p>Lackschonende Handwäsche vom Profi. Keine Kratzer, keine Bürsten — nur sanfte Präzisionspflege.</p>
+                <p>Lackschonende Handwäsche vom Profi. Keine Kratzer, keine Bürsten — nur sanfte Präzisionspflege von Hand.</p>
             </div>
-            <div class="glass svc-card reveal delay-1">
+
+            <div class="glass svc-card reveal d1">
+                <div class="svc-bg" style="background-image:url('assets/eyosias-g-zHeaaWKo1B4-unsplash.jpg');background-position:center 40%"></div>
                 <span class="svc-num">03</span>
                 <span class="svc-icon">✨</span>
                 <h3>Lackpolitur</h3>
                 <p>Mehrstufiges Polieren für ein Finish wie Glas. Stumpfer Lack erstrahlt wieder in vollem Glanz.</p>
             </div>
-            <div class="glass svc-card reveal delay-2">
+
+            <div class="glass svc-card reveal d2">
+                <div class="svc-bg" style="background-image:url('assets/angelica-levshakowa-5zglggV8nE0-unsplash.jpg')"></div>
                 <span class="svc-num">04</span>
                 <span class="svc-icon">🛡️</span>
                 <h3>Keramikversiegelung</h3>
                 <p>High-End Schutz für Lack, Scheiben und Felgen. Langanhaltend, hydrophob, extremer Tiefenglanz.</p>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ PREISE ═══════════════════════════ -->
+<!-- ════ PHOTO STRIP ════ -->
+<div class="photo-strip">
+    <img src="assets/sanmeet-chahil-dveDkZQJVjQ-unsplash.jpg" alt="Professionelle Fahrzeugaufbereitung" loading="lazy">
+    <div class="photo-strip-overlay"></div>
+    <span class="photo-strip-label">Präzision · Leidenschaft · Perfektion</span>
+</div>
+
+<!-- ════ PREISE ════ -->
 <section id="preise">
     <div class="container">
         <div class="reveal">
             <div class="sec-tag">Transparente Preise</div>
-            <h2 class="sec-title">Pakete &<br><span class="accent">Preise.</span></h2>
+            <h2 class="sec-title">Pakete &<br><span class="ac">Preise.</span></h2>
         </div>
         <div class="price-note reveal">
             Jedes Fahrzeug ist einzigartig — der tatsächliche Aufwand wird nach individueller Begutachtung ermittelt.
-            Alle Preise sind Richtpreise ab-Preise, abhängig von Verschmutzungsgrad und Fahrzeugzustand.
+            Alle Preise sind Richtpreise, abhängig von Verschmutzungsgrad und Fahrzeugzustand.
         </div>
         <div class="tabs reveal">
-            <button class="tab-btn active" data-tab="kleinwagen">Kleinwagen</button>
-            <button class="tab-btn" data-tab="mittelklasse">Mittelklasse</button>
-            <button class="tab-btn" data-tab="oberklasse">Oberklasse & SUV</button>
-            <button class="tab-btn" data-tab="erweitertes">Erweitertes</button>
+            <button class="tab-btn active" data-tab="k">Kleinwagen</button>
+            <button class="tab-btn" data-tab="m">Mittelklasse</button>
+            <button class="tab-btn" data-tab="o">Oberklasse & SUV</button>
+            <button class="tab-btn" data-tab="e">Erweitertes</button>
         </div>
 
-        <div class="tab-pane active" id="tab-kleinwagen">
-            <p class="tab-subtitle">z.B. VW UP, Polo, Renault Clio, Ford Fiesta etc.</p>
+        <div class="tab-pane active" id="tab-k">
+            <p class="tab-sub">z.B. VW UP, Polo, Renault Clio, Ford Fiesta etc.</p>
             <div class="price-grid">
-                <div class="glass price-card reveal">
-                    <div class="p-label">Paket 01</div>
-                    <div class="p-name">Innenreinigung Basic</div>
-                    <div class="p-amount">80€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
-                </div>
-                <div class="glass price-card reveal delay-1">
-                    <div class="p-label">Paket 02</div>
-                    <div class="p-name">Außenreinigung Basic</div>
-                    <div class="p-amount">70€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
-                </div>
-                <div class="glass price-card featured reveal delay-2">
-                    <div class="p-label">Paket 03</div>
-                    <div class="p-name">Lackpolitur & Versiegelung</div>
-                    <div class="p-amount">300€</div>
-                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
-                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
-                </div>
-                <div class="glass price-card reveal delay-3">
-                    <div class="p-label">Paket 04</div>
-                    <div class="p-name">Premium-Paket</div>
-                    <div class="p-amount">420€</div>
-                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
-                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
-                </div>
+                <div class="glass price-card"><div class="p-lbl">Paket 01</div><div class="p-name">Innenreinigung Basic</div><div class="p-amt">80€</div><div class="p-from">ab</div><div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 02</div><div class="p-name">Außenreinigung Basic</div><div class="p-amt">70€</div><div class="p-from">ab</div><div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div></div>
+                <div class="glass price-card hot"><div class="p-lbl">Paket 03</div><div class="p-name">Lackpolitur & Versiegelung</div><div class="p-amt">300€</div><div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div><div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 04</div><div class="p-name">Premium-Paket</div><div class="p-amt">420€</div><div class="p-from">ab · Mehrstufige Politur + Sprühversiegelung</div><div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div></div>
             </div>
         </div>
 
-        <div class="tab-pane" id="tab-mittelklasse">
-            <p class="tab-subtitle">z.B. Audi A4, VW Golf, VW Passat, BMW 3er etc.</p>
+        <div class="tab-pane" id="tab-m">
+            <p class="tab-sub">z.B. Audi A4, VW Golf, VW Passat, BMW 3er etc.</p>
             <div class="price-grid">
-                <div class="glass price-card">
-                    <div class="p-label">Paket 01</div>
-                    <div class="p-name">Innenreinigung Basic</div>
-                    <div class="p-amount">110€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Paket 02</div>
-                    <div class="p-name">Außenreinigung Basic</div>
-                    <div class="p-amount">90€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
-                </div>
-                <div class="glass price-card featured">
-                    <div class="p-label">Paket 03</div>
-                    <div class="p-name">Lackpolitur & Versiegelung</div>
-                    <div class="p-amount">380€</div>
-                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
-                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Paket 04</div>
-                    <div class="p-name">Premium-Paket</div>
-                    <div class="p-amount">550€</div>
-                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
-                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
-                </div>
+                <div class="glass price-card"><div class="p-lbl">Paket 01</div><div class="p-name">Innenreinigung Basic</div><div class="p-amt">110€</div><div class="p-from">ab</div><div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 02</div><div class="p-name">Außenreinigung Basic</div><div class="p-amt">90€</div><div class="p-from">ab</div><div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div></div>
+                <div class="glass price-card hot"><div class="p-lbl">Paket 03</div><div class="p-name">Lackpolitur & Versiegelung</div><div class="p-amt">380€</div><div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div><div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 04</div><div class="p-name">Premium-Paket</div><div class="p-amt">550€</div><div class="p-from">ab · Mehrstufige Politur + Sprühversiegelung</div><div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div></div>
             </div>
         </div>
 
-        <div class="tab-pane" id="tab-oberklasse">
-            <p class="tab-subtitle">z.B. Audi A6/Q7, Mercedes E-Klasse, BMW 5er, SUV etc.</p>
+        <div class="tab-pane" id="tab-o">
+            <p class="tab-sub">z.B. Audi A6/Q7, Mercedes E-Klasse, BMW 5er, SUV etc.</p>
             <div class="price-grid">
-                <div class="glass price-card">
-                    <div class="p-label">Paket 01</div>
-                    <div class="p-name">Innenreinigung Basic</div>
-                    <div class="p-amount">120€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Paket 02</div>
-                    <div class="p-name">Außenreinigung Basic</div>
-                    <div class="p-amount">110€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div>
-                </div>
-                <div class="glass price-card featured">
-                    <div class="p-label">Paket 03</div>
-                    <div class="p-name">Lackpolitur & Versiegelung</div>
-                    <div class="p-amount">450€</div>
-                    <div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div>
-                    <div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Paket 04</div>
-                    <div class="p-name">Premium-Paket</div>
-                    <div class="p-amount">630€</div>
-                    <div class="p-from">ab · mehrstufige Politur + Sprühversiegelung</div>
-                    <div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div>
-                </div>
+                <div class="glass price-card"><div class="p-lbl">Paket 01</div><div class="p-name">Innenreinigung Basic</div><div class="p-amt">120€</div><div class="p-from">ab</div><div class="p-desc">Tiefensaugen, Cockpit & Oberflächen reinigen, Scheiben innen.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 02</div><div class="p-name">Außenreinigung Basic</div><div class="p-amt">110€</div><div class="p-from">ab</div><div class="p-desc">2-Phasen Handwäsche und Felgenreinigung.</div></div>
+                <div class="glass price-card hot"><div class="p-lbl">Paket 03</div><div class="p-name">Lackpolitur & Versiegelung</div><div class="p-amt">450€</div><div class="p-from">ab · 1-stufig · inkl. Basic Innen & Außen</div><div class="p-desc">Stumpfer Lack wird wieder zum Strahlen gebracht.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Paket 04</div><div class="p-name">Premium-Paket</div><div class="p-amt">630€</div><div class="p-from">ab · Mehrstufige Politur + Sprühversiegelung</div><div class="p-desc">Das komplette Rundum-Sorglos-Paket.</div></div>
             </div>
         </div>
 
-        <div class="tab-pane" id="tab-erweitertes">
-            <p class="tab-subtitle">Ergänzende Leistungen für alle Fahrzeugklassen.</p>
+        <div class="tab-pane" id="tab-e">
+            <p class="tab-sub">Ergänzende Leistungen für alle Fahrzeugklassen.</p>
             <div class="price-grid">
-                <div class="glass price-card">
-                    <div class="p-label">Add-on 01</div>
-                    <div class="p-name">Scheibenversiegelung Frontscheibe</div>
-                    <div class="p-amount">50€</div>
-                    <div class="p-from">ab</div>
-                    <div class="p-desc">Dauerhaft deutlich bessere Sicht bei Regen und Spritzwasser.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Add-on 02</div>
-                    <div class="p-name">Scheinwerfer&shy;aufbereitung</div>
-                    <div class="p-amount">50€</div>
-                    <div class="p-from">ab · pro Stück</div>
-                    <div class="p-desc">Vergilbte Scheinwerfer werden wieder kristallklar.</div>
-                </div>
-                <div class="glass price-card">
-                    <div class="p-label">Add-on 03</div>
-                    <div class="p-name">Keramikversiegelung Felgen</div>
-                    <div class="p-amount">45€</div>
-                    <div class="p-from">ab · pro Stück · bis 16 Monate Schutz</div>
-                    <div class="p-desc">Langanhaltender Schutz gegen Bremsenstaub und Schmutz.</div>
-                </div>
-                <div class="glass price-card featured">
-                    <div class="p-label">Add-on 04</div>
-                    <div class="p-name">Keramikversiegelung Lack</div>
-                    <div class="p-amount">370€</div>
-                    <div class="p-from">ab · Premium ab 490€</div>
-                    <div class="p-desc">Maximaler Langzeitschutz. Hydrophob, kratzresistent, extremer Tiefenglanz.</div>
-                </div>
+                <div class="glass price-card"><div class="p-lbl">Add-on 01</div><div class="p-name">Scheibenversiegelung Frontscheibe</div><div class="p-amt">50€</div><div class="p-from">ab</div><div class="p-desc">Dauerhaft deutlich bessere Sicht bei Regen und Spritzwasser.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Add-on 02</div><div class="p-name">Scheinwerfer&shy;aufbereitung</div><div class="p-amt">50€</div><div class="p-from">ab · pro Stück</div><div class="p-desc">Vergilbte Scheinwerfer werden wieder kristallklar.</div></div>
+                <div class="glass price-card"><div class="p-lbl">Add-on 03</div><div class="p-name">Keramikversiegelung Felgen</div><div class="p-amt">45€</div><div class="p-from">ab · pro Stück · bis 16 Monate Schutz</div><div class="p-desc">Langanhaltender Schutz gegen Bremsenstaub und Schmutz.</div></div>
+                <div class="glass price-card hot"><div class="p-lbl">Add-on 04</div><div class="p-name">Keramikversiegelung Lack</div><div class="p-amt">370€</div><div class="p-from">ab · Premium ab 490€</div><div class="p-desc">Maximaler Langzeitschutz. Hydrophob, kratzresistent, extremer Tiefenglanz.</div></div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ BEWERTUNGEN ═══════════════════════════ -->
+<!-- ════ PHOTO STRIP 2 ════ -->
+<div class="photo-strip">
+    <img src="assets/zac-nielson-m5g2IFRouCs-unsplash.jpg" alt="Detailing — Felgenreinigung" loading="lazy" style="object-position:center 70%">
+    <div class="photo-strip-overlay"></div>
+    <span class="photo-strip-label">Handarbeit · Präzision · Hingabe</span>
+</div>
+
+<!-- ════ BEWERTUNGEN ════ -->
 <section id="bewertungen">
     <div class="container">
         <div class="reveal">
             <div class="sec-tag">Was Kunden sagen</div>
-            <h2 class="sec-title">Google<br><span class="accent">Bewertungen.</span></h2>
+            <h2 class="sec-title">Google<br><span class="ac">Bewertungen.</span></h2>
         </div>
-        <div class="reviews-header reveal">
-            <div class="reviews-score">5.0</div>
-            <div class="reviews-meta-right">
-                <div class="reviews-stars">★★★★★</div>
-                <div class="reviews-sub">Basierend auf Google Bewertungen</div>
-                <a class="reviews-link" href="https://g.co/kgs/glanzkrass" target="_blank">Alle Bewertungen auf Google →</a>
+        <div class="reviews-head reveal">
+            <div class="score">5.0</div>
+            <div class="score-right">
+                <div class="stars">★★★★★</div>
+                <div class="score-sub">Basierend auf Google Bewertungen</div>
+                <a class="score-link" href="https://g.co/kgs/glanzkrass" target="_blank" rel="noopener">Alle Bewertungen auf Google →</a>
             </div>
         </div>
-        <div class="reviews-grid">
-            <div class="glass review-card reveal">
+        <div class="rev-grid">
+            <div class="glass rev-card reveal">
                 <div class="rv-stars">★★★★★</div>
-                <p class="rv-text">"Absolut top! Mein Auto sieht aus wie neu. Mario ist super professionell und nimmt sich die Zeit, wirklich jeden Winkel zu bearbeiten. Absolute Weiterempfehlung!"</p>
-                <div class="rv-author">
-                    <div class="rv-avatar">TK</div>
-                    <div>
-                        <div class="rv-name">Thomas K.</div>
-                        <div class="rv-date">Google Rezension</div>
-                    </div>
-                </div>
+                <p class="rv-txt">"Absolut top! Mein Auto sieht aus wie neu. Mario ist super professionell und nimmt sich die Zeit, wirklich jeden Winkel zu bearbeiten. Absolute Weiterempfehlung!"</p>
+                <div class="rv-auth"><div class="rv-av">TK</div><div><div class="rv-name">Thomas K.</div><div class="rv-date">Google Rezension</div></div></div>
             </div>
-            <div class="glass review-card reveal delay-1">
+            <div class="glass rev-card reveal d1">
                 <div class="rv-stars">★★★★★</div>
-                <p class="rv-text">"Unglaubliches Ergebnis! Habe die Keramikversiegelung machen lassen — das Wasser perlt einfach ab und der Lack strahlt wie am ersten Tag. Mega zufrieden."</p>
-                <div class="rv-author">
-                    <div class="rv-avatar">SM</div>
-                    <div>
-                        <div class="rv-name">Sandra M.</div>
-                        <div class="rv-date">Google Rezension</div>
-                    </div>
-                </div>
+                <p class="rv-txt">"Unglaubliches Ergebnis! Keramikversiegelung machen lassen — das Wasser perlt einfach ab und der Lack strahlt wie am ersten Tag. Mega zufrieden."</p>
+                <div class="rv-auth"><div class="rv-av">SM</div><div><div class="rv-name">Sandra M.</div><div class="rv-date">Google Rezension</div></div></div>
             </div>
-            <div class="glass review-card reveal delay-2">
+            <div class="glass rev-card reveal d2">
                 <div class="rv-stars">★★★★★</div>
-                <p class="rv-text">"Bestes Preis-Leistungs-Verhältnis in der Region. Mario arbeitet mit echter Leidenschaft. Mein SUV glänzt wie beim Neuwagenkauf — bin absolut begeistert!"</p>
-                <div class="rv-author">
-                    <div class="rv-avatar">JP</div>
-                    <div>
-                        <div class="rv-name">Jan P.</div>
-                        <div class="rv-date">Google Rezension</div>
-                    </div>
-                </div>
+                <p class="rv-txt">"Bestes Preis-Leistungs-Verhältnis in der Region. Mario arbeitet mit echter Leidenschaft. Mein SUV glänzt wie beim Neuwagenkauf — absolut begeistert!"</p>
+                <div class="rv-auth"><div class="rv-av">JP</div><div><div class="rv-name">Jan P.</div><div class="rv-date">Google Rezension</div></div></div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ ÜBER UNS ═══════════════════════════ -->
+<!-- ════ ÜBER UNS ════ -->
 <section id="about">
     <div class="container">
         <div class="reveal">
             <div class="sec-tag">Über GlanzKrass</div>
-            <h2 class="sec-title">Wir sind<br><span class="accent">GlanzKrass.</span></h2>
+            <h2 class="sec-title">Wir sind<br><span class="ac">GlanzKrass.</span></h2>
         </div>
         <div class="about-grid">
             <div class="about-copy reveal">
@@ -1201,49 +788,31 @@
                 <p>Ob Innenreinigung, Lackpflege, komplette Fahrzeugaufbereitung oder Keramikversiegelung — ich bringe dein Auto auf Hochglanz. Mit Leidenschaft, Präzision und dem Blick fürs Detail sorge ich dafür, dass dein Fahrzeug aussieht wie neu.</p>
                 <p>Erlebe den Unterschied — Glanzkrass macht's möglich!</p>
                 <div class="about-stats">
-                    <div class="glass stat">
-                        <div class="stat-n">5★</div>
-                        <div class="stat-l">Google</div>
-                    </div>
-                    <div class="glass stat">
-                        <div class="stat-n">100%</div>
-                        <div class="stat-l">Handarbeit</div>
-                    </div>
-                    <div class="glass stat">
-                        <div class="stat-n">∞</div>
-                        <div class="stat-l">Leidenschaft</div>
-                    </div>
+                    <div class="glass stat"><div class="stat-n">5★</div><div class="stat-l">Google</div></div>
+                    <div class="glass stat"><div class="stat-n">100%</div><div class="stat-l">Handarbeit</div></div>
+                    <div class="glass stat"><div class="stat-n">∞</div><div class="stat-l">Leidenschaft</div></div>
                 </div>
             </div>
-            <div class="about-img-wrap reveal delay-1">
-                <img src="https://www.glanzkrass.de/wp-content/uploads/go-x/u/d55c4c0a-2fa6-4e59-a2aa-954e2b513401/image.jpg" alt="Mario Kirchner – GlanzKrass Fahrzeugaufbereitung" loading="lazy">
+            <div class="about-img reveal d1">
+                <img src="assets/eyosias-g-zHeaaWKo1B4-unsplash.jpg" alt="GlanzKrass — Professionelle Fahrzeugaufbereitung" loading="lazy">
             </div>
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ KONTAKT ═══════════════════════════ -->
+<!-- ════ KONTAKT ════ -->
 <section id="kontakt">
     <div class="container">
         <div class="reveal">
             <div class="sec-tag">Jetzt anfragen</div>
-            <h2 class="sec-title">Termin<br><span class="accent">Anfragen.</span></h2>
+            <h2 class="sec-title">Termin<br><span class="ac">Anfragen.</span></h2>
         </div>
         <div class="kontakt-grid">
-            <form class="reveal" onsubmit="formSubmit(event)">
-                <div class="form-field">
-                    <label>Ihr Name</label>
-                    <input type="text" required placeholder="Max Mustermann">
-                </div>
-                <div class="form-field">
-                    <label>Telefon oder E-Mail</label>
-                    <input type="text" required placeholder="+49 ... oder name@mail.de">
-                </div>
-                <div class="form-field">
-                    <label>Ihr Fahrzeug</label>
-                    <input type="text" placeholder="z.B. VW Golf VII, Baujahr 2019, schwarz">
-                </div>
-                <div class="form-field">
+            <form class="reveal" onsubmit="fSubmit(event)">
+                <div class="ff"><label>Ihr Name</label><input type="text" required placeholder="Max Mustermann"></div>
+                <div class="ff"><label>Telefon oder E-Mail</label><input type="text" required placeholder="+49 ... oder name@mail.de"></div>
+                <div class="ff"><label>Ihr Fahrzeug</label><input type="text" placeholder="z.B. VW Golf VII, 2019, schwarz"></div>
+                <div class="ff">
                     <label>Gewünschte Leistung</label>
                     <select>
                         <option value="">Bitte wählen …</option>
@@ -1258,225 +827,126 @@
                         <option>Sonstiges / Beratung</option>
                     </select>
                 </div>
-                <div class="form-field">
-                    <label>Nachricht</label>
-                    <textarea placeholder="Weitere Details, Terminwünsche …"></textarea>
-                </div>
-                <p class="form-dsgvo">
-                    Mit dem Absenden stimmen Sie unserer <a href="datenschutz.html">Datenschutzerklärung</a> zu.
-                </p>
-                <button type="submit" class="form-submit">Anfrage senden →</button>
+                <div class="ff"><label>Nachricht</label><textarea placeholder="Weitere Details, Terminwünsche …"></textarea></div>
+                <p class="f-dsgvo">Mit dem Absenden stimmen Sie unserer <a href="datenschutz.html">Datenschutzerklärung</a> zu.</p>
+                <button type="submit" class="f-submit">Anfrage senden →</button>
             </form>
-
-            <div class="reveal delay-1">
-                <div class="contact-items">
-                    <div class="glass ci">
-                        <div class="ci-icon">📍</div>
-                        <div>
-                            <div class="ci-lbl">Adresse</div>
-                            <span class="ci-val">Am Moorkamp 8<br>38527 Meine / Wedelheine</span>
-                        </div>
-                    </div>
-                    <div class="glass ci">
-                        <div class="ci-icon">📞</div>
-                        <div>
-                            <div class="ci-lbl">Telefon</div>
-                            <a class="ci-val" href="tel:+4917828021918">+49 178 2802191</a>
-                        </div>
-                    </div>
-                    <div class="glass ci">
-                        <div class="ci-icon">✉️</div>
-                        <div>
-                            <div class="ci-lbl">E-Mail</div>
-                            <a class="ci-val" href="mailto:info@glanzkrass.de">info@glanzkrass.de</a>
-                        </div>
-                    </div>
-                    <div class="glass ci">
-                        <div class="ci-icon">📷</div>
-                        <div>
-                            <div class="ci-lbl">Instagram</div>
-                            <a class="ci-val" href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">@glanzkrass</a>
-                        </div>
-                    </div>
+            <div class="reveal d1">
+                <div class="ci-list">
+                    <div class="glass ci"><div class="ci-ico">📍</div><div><div class="ci-lbl">Adresse</div><span class="ci-val">Am Moorkamp 8<br>38527 Meine / Wedelheine</span></div></div>
+                    <div class="glass ci"><div class="ci-ico">📞</div><div><div class="ci-lbl">Telefon</div><a class="ci-val" href="tel:+4917828021918">+49 178 2802191</a></div></div>
+                    <div class="glass ci"><div class="ci-ico">✉️</div><div><div class="ci-lbl">E-Mail</div><a class="ci-val" href="mailto:info@glanzkrass.de">info@glanzkrass.de</a></div></div>
+                    <div class="glass ci"><div class="ci-ico">📷</div><div><div class="ci-lbl">Instagram</div><a class="ci-val" href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">@glanzkrass</a></div></div>
                 </div>
-                <div class="map-box">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde"
-                        width="100%" height="100%"
-                        style="border:0;" allowfullscreen="" loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                <div class="map-wrap">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2434.9080829871147!2d10.59828!3d52.39999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47aff37b0e450461%3A0x3faf24332da29ab!2sGlanzkrass%20Fahrzeugaufbereitung!5e0!3m2!1sde!2sde!4v1700000000000!5m2!1sde!2sde" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
 <footer>
     <div class="container">
         <div class="footer-inner">
-            <div class="footer-logo">GLANZKRASS.</div>
-            <div class="footer-links">
+            <div class="f-logo">GLANZKRASS.</div>
+            <div class="f-links">
                 <a href="impressum.html">Impressum</a>
                 <a href="datenschutz.html">Datenschutz</a>
                 <a href="https://www.instagram.com/glanzkrass/" target="_blank" rel="noopener">Instagram</a>
                 <a href="mailto:info@glanzkrass.de">E-Mail</a>
                 <a href="tel:+4917828021918">Telefon</a>
             </div>
-            <div class="footer-copy">© 2026 GlanzKrass · Mario Kirchner · Am Moorkamp 8, 38527 Meine</div>
+            <div class="f-copy">© 2026 GlanzKrass · Mario Kirchner · Am Moorkamp 8, 38527 Meine</div>
         </div>
     </div>
 </footer>
 
 <script>
-/* ═══════ CURSOR ═══════ */
-const cur = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-let mx=0, my=0, rx=0, ry=0;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-function animCursor() {
-    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
-    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-    requestAnimationFrame(animCursor);
-}
-animCursor();
-document.querySelectorAll('a, button, .tab-btn').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-        cur.style.width = '20px'; cur.style.height = '20px';
-        ring.style.width = '60px'; ring.style.height = '60px';
-        ring.style.borderColor = 'rgba(0,212,255,0.7)';
-    });
-    el.addEventListener('mouseleave', () => {
-        cur.style.width = '10px'; cur.style.height = '10px';
-        ring.style.width = '40px'; ring.style.height = '40px';
-        ring.style.borderColor = 'rgba(0,212,255,0.4)';
-    });
+/* ── CURSOR ── */
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function animC(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animC)})();
+document.querySelectorAll('a,button,.tab-btn,.svc-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';ring.style.width='56px';ring.style.height='56px';ring.style.borderColor='rgba(0,212,255,.7)'});
+    el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='40px';ring.style.height='40px';ring.style.borderColor='rgba(0,212,255,.35)'});
 });
 
-/* ═══════ RAIN CANVAS ═══════ */
-const canvas = document.getElementById('rain-canvas');
-const ctx = canvas.getContext('2d');
-let W, H;
-function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-resize();
-window.addEventListener('resize', resize);
+/* ── RAIN CANVAS ── */
+const cv=document.getElementById('rain'),ctx=cv.getContext('2d');
+let W,H;
+function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+rsz(); window.addEventListener('resize',rsz);
+let mX=-1000,mY=-1000;
+document.addEventListener('mousemove',e=>{mX=e.clientX;mY=e.clientY});
 
-let mouseX = -1000, mouseY = -1000;
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-
-class Drop {
-    constructor() { this.reset(true); }
-    reset(init = false) {
-        this.x = Math.random() * W;
-        this.baseX = this.x;
-        this.y = init ? Math.random() * H : -30;
-        this.vy = 1.8 + Math.random() * 3.2;
-        this.len = 10 + Math.random() * 28;
-        this.alpha = 0.07 + Math.random() * 0.22;
-        this.w = 0.4 + Math.random() * 1.1;
-        this.phase = Math.random() * Math.PI * 2;
-        this.freq = 0.003 + Math.random() * 0.008;
+class Drop{
+    constructor(){this.init(true)}
+    init(s=false){
+        this.x=Math.random()*W; this.bx=this.x;
+        this.y=s?Math.random()*H:-20;
+        this.vy=1.6+Math.random()*3.4;
+        this.len=10+Math.random()*26;
+        this.a=.07+Math.random()*.22;
+        this.w=.4+Math.random()*1.1;
+        this.ph=Math.random()*Math.PI*2;
+        this.fr=.003+Math.random()*.008;
     }
-    update(t) {
-        const dx = this.x - mouseX;
-        const dy = this.y - mouseY;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 180 && dist > 0) {
-            const f = (180 - dist) / 180 * 5;
-            this.x += (dx / dist) * f;
-        }
-        this.x += (this.baseX - this.x) * 0.015;
-        this.x += Math.sin(t * this.freq + this.phase) * 0.4;
-        this.y += this.vy;
-        if (this.y > H + 40) this.reset();
+    tick(t){
+        const dx=this.x-mX,dy=this.y-mY,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<170&&d>0){const f=(170-d)/170*5.5;this.x+=(dx/d)*f}
+        this.x+=(this.bx-this.x)*.015;
+        this.x+=Math.sin(t*this.fr+this.ph)*.35;
+        this.y+=this.vy;
+        if(this.y>H+40)this.init();
     }
-    draw() {
-        const grad = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.len);
-        grad.addColorStop(0, `rgba(0,200,255,0)`);
-        grad.addColorStop(0.4, `rgba(0,212,255,${this.alpha})`);
-        grad.addColorStop(1, `rgba(150,235,255,0)`);
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x, this.y + this.len);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = this.w;
-        ctx.lineCap = 'round';
-        ctx.stroke();
+    draw(){
+        const g=ctx.createLinearGradient(this.x,this.y,this.x,this.y+this.len);
+        g.addColorStop(0,'rgba(0,200,255,0)');
+        g.addColorStop(.45,`rgba(0,212,255,${this.a})`);
+        g.addColorStop(1,'rgba(140,230,255,0)');
+        ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(this.x,this.y+this.len);
+        ctx.strokeStyle=g;ctx.lineWidth=this.w;ctx.lineCap='round';ctx.stroke();
     }
 }
+const drops=Array.from({length:200},()=>new Drop());
+let t=0;
+(function animR(){ctx.clearRect(0,0,W,H);t++;drops.forEach(d=>{d.tick(t);d.draw()});requestAnimationFrame(animR)})();
 
-const drops = Array.from({length: 200}, () => new Drop());
-let t = 0;
+/* ── NAV ── */
+function navToggle(){document.getElementById('nav-ov').classList.toggle('open');document.getElementById('nav-pill').classList.toggle('open')}
+function navClose(){document.getElementById('nav-ov').classList.remove('open');document.getElementById('nav-pill').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')navClose()});
 
-function animRain() {
-    ctx.clearRect(0, 0, W, H);
-    t++;
-    drops.forEach(d => { d.update(t); d.draw(); });
-    requestAnimationFrame(animRain);
-}
-animRain();
-
-/* ═══════ NAV ═══════ */
-function navToggle() {
-    document.getElementById('nav-overlay').classList.toggle('open');
-    document.getElementById('nav-pill').classList.toggle('open');
-}
-function navClose() {
-    document.getElementById('nav-overlay').classList.remove('open');
-    document.getElementById('nav-pill').classList.remove('open');
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') navClose(); });
-
-/* ═══════ TABS ═══════ */
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const tab = this.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+/* ── TABS ── */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+        const id=this.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
         this.classList.add('active');
-        document.getElementById('tab-' + tab).classList.add('active');
-        // Re-trigger reveal for new cards
-        document.querySelectorAll('#tab-' + tab + ' .reveal').forEach(el => {
-            el.classList.remove('visible');
-            setTimeout(() => el.classList.add('visible'), 50);
-        });
+        document.getElementById('tab-'+id).classList.add('active');
+        document.querySelectorAll('#tab-'+id+' .reveal').forEach(el=>{el.classList.remove('vis');setTimeout(()=>el.classList.add('vis'),50)});
     });
 });
 
-/* ═══════ SCROLL REVEAL ═══════ */
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* ── REVEAL ── */
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-/* ═══════ COOKIE ═══════ */
-function cookieAccept() {
-    document.getElementById('cookie').classList.add('hidden');
-    localStorage.setItem('gk_consent', '1');
-}
-function cookieDecline() {
-    document.getElementById('cookie').classList.add('hidden');
-    localStorage.setItem('gk_consent', '0');
-}
-if (localStorage.getItem('gk_consent') !== null) {
-    document.getElementById('cookie').classList.add('hidden');
-}
+/* ── COOKIE ── */
+function ckAccept(){document.getElementById('cookie').classList.add('hidden');localStorage.setItem('gk','1')}
+function ckDecline(){document.getElementById('cookie').classList.add('hidden');localStorage.setItem('gk','0')}
+if(localStorage.getItem('gk')!==null)document.getElementById('cookie').classList.add('hidden');
 
-/* ═══════ FORM ═══════ */
-function formSubmit(e) {
+/* ── FORM ── */
+function fSubmit(e){
     e.preventDefault();
-    const btn = e.target.querySelector('.form-submit');
-    btn.textContent = '✓ Anfrage gesendet!';
-    btn.style.background = '#00ff99';
-    btn.disabled = true;
-    setTimeout(() => {
-        btn.textContent = 'Anfrage senden →';
-        btn.style.background = '';
-        btn.disabled = false;
-        e.target.reset();
-    }, 4000);
+    const b=e.target.querySelector('.f-submit');
+    b.textContent='✓ Anfrage gesendet!';b.style.background='#00ff99';b.disabled=true;
+    setTimeout(()=>{b.textContent='Anfrage senden →';b.style.background='';b.disabled=false;e.target.reset()},4000);
 }
 </script>
 </body>
